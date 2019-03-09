@@ -1,7 +1,7 @@
 var provider = new firebase.auth.GoogleAuthProvider();
 var database = firebase.database();
 
-var user;
+var user = firebase.auth().currentUser;
 var token;
 var displayName;
 var photoURL;
@@ -92,8 +92,7 @@ function getUserData(userId, data) {
 }
 
 window.onload = function() {
-  user = firebase.auth().currentUser;
-  if (user) {
+    if (user) {
     // User is signed in.
     displayName = user.displayName;
     photoURL = user.photoURL;
