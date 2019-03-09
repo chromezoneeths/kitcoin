@@ -72,9 +72,9 @@ firebase.auth().onAuthStateChanged(function(user) {
         id: id
       });
     }
-    console.log(getStudentData('id'));
-    console.log(getStudentData('username'));
-    console.log(getStudentData('email'));
+    console.log(getUserData('id'));
+    console.log(getUserData('username'));
+    console.log(getUserData('email'));
   } else {
     // User is signed out.
     // ...
