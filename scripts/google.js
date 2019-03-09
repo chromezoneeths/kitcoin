@@ -84,8 +84,10 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 function getUserData(data) {
   var userId = firebase.auth().currentUser.uid;
+  var res;
   firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
-    return (snapshot.val() && snapshot.val()[data]) || null;
+    res =  (snapshot.val() && snapshot.val()[data]) || null;
     // ...
   });
+  return res;
 }
