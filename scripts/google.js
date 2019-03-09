@@ -72,9 +72,9 @@ firebase.auth().onAuthStateChanged(function(user) {
         id: id
       });
     }
-    console.log(getUserData('id'));
-    console.log(getUserData('username'));
-    console.log(getUserData('email'));
+    console.log(getUserData(uid, 'id'));
+    console.log(getUserData(uid, 'username'));
+    console.log(getUserData(uid, 'email'));
   } else {
     // User is signed out.
     // ...
@@ -82,8 +82,7 @@ firebase.auth().onAuthStateChanged(function(user) {
   }
 });
 
-function getUserData(data) {
-  var userId = user.uid;
+function getUserData(userId, data) {
   var res;
   firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
     res =  (snapshot.val() && snapshot.val()[data]) || null;
