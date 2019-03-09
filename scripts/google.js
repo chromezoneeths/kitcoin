@@ -53,7 +53,7 @@ firebase.auth().getRedirectResult().then(function(result) {
   // ...
 });
 
-firebase.auth().onAuthStateChanged(function(user) {
+/*firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     // User is signed in.
     displayName = user.displayName;
@@ -80,7 +80,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     // ...
     console.log('No User');
   }
-});
+});*/
 
 function getUserData(userId, data) {
   var res;
@@ -90,3 +90,33 @@ function getUserData(userId, data) {
   });
   return res;
 }
+
+window.onload = function() {
+  user = firebase.auth().currentUser;
+  if (user) {
+    // User is signed in.
+    displayName = user.displayName;
+    photoURL = user.photoURL;
+    uid = user.uid;
+    email = user.email;
+    providerData = user.providerData;
+    // ...
+    console.log(user);
+    var id = getUserData('id');
+    if (typeof id !== 'number' && typeof id !== 'string') {
+      id = prompt('What\'s your ETHS student ID?');
+      firebase.database().ref('users/' + uid).set({
+        username: email.split("@")[0],
+        email: email,
+        id: id
+      });
+    }
+    console.log(getUserData(uid, 'id'));
+    console.log(getUserData(uid, 'username'));
+    console.log(getUserData(uid, 'email'));
+  } else {
+    // User is signed out.
+    // ...
+    console.log('No User');
+  }
+};
