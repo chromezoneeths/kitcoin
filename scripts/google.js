@@ -64,7 +64,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     // ...
     console.log(user);
     var id = getUserData('id');
-    if (id == null) {
+    if (typeof id !== 'number' && typeof id !== 'string') {
       id = prompt('What\'s your ETHS student ID?');
       firebase.database().ref('users/' + userId).set({
         username: email.split("@")[0],
