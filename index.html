@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <button onclick="signIn();">Login with Google</button>
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase-auth.js"></script>
+  <!--<script src="https://www.gstatic.com/firebasejs/5.8.6/firebase-database.js"></script>-->
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyDczvnhoOkundtOWD1lcsJZSwRDGSXiZGc",
+      authDomain: "kitcoin-1552143509204.firebaseapp.com",
+      databaseURL: "https://kitcoin-1552143509204.firebaseio.com",
+      projectId: "kitcoin-1552143509204",
+      storageBucket: "kitcoin-1552143509204.appspot.com",
+      messagingSenderId: "2422563589"
+    };
+    firebase.initializeApp(config);
+  </script>
+
+  <script src="scripts/google.js"></script>
+</body>
+
+</html>
