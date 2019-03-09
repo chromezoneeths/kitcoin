@@ -66,7 +66,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     var id = getUserData('id');
     if (typeof id !== 'number' && typeof id !== 'string') {
       id = prompt('What\'s your ETHS student ID?');
-      firebase.database().ref('users/' + userId).set({
+      firebase.database().ref('users/' + uid).set({
         username: email.split("@")[0],
         email: email,
         id: id
@@ -85,7 +85,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 function getUserData(data) {
   var userId = firebase.auth().currentUser.uid;
   var res;
-  firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
+  firebase.database().ref('/users/' + uid).once('value').then(function(snapshot) {
     res =  (snapshot.val() && snapshot.val()[data]) || null;
     // ...
   });
