@@ -1,7 +1,8 @@
+/*jshint esversion: 6*/
 var provider = new firebase.auth.GoogleAuthProvider();
 var database = firebase.database();
 
-var user = firebase.auth().currentUser;
+var user;
 var token;
 var displayName;
 var photoURL;
@@ -53,41 +54,39 @@ firebase.auth().getRedirectResult().then(function(result) {
   // ...
 });
 
-firebase.auth().onAuthStateChanged(function(user) {
-if (user) {
-  // User is signed in.
-  displayName = user.displayName;
-  photoURL = user.photoURL;
-  uid = user.uid;
-  email = user.email;
-  providerData = user.providerData;
-  // ...
-  console.log(user);
-  var id = getUserData('id');
-  if (typeof id !== 'number' && typeof id !== 'string') {
-    id = prompt('What\'s your ETHS student ID?');
-    firebase.database().ref('users/' + uid).set({
-      username: email.split("@")[0],
-      email: email,
-      id: id
+firebase.auth().onAuthStateChanged(function(u) {
+  if (u) {
+    user = u;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('signout').style.display = 'block';
+
+    fbData('/users/' + user.uid, 'id').then(function(data) {
+      var id = data.val();
+      if (id == undefined) {
+        id = prompt('Please enter your student ID number');
+        fbData('/users/' + user.uid, 'id', id);
+      }
     });
+  } else {
+    // User is signed out.
+    // ...
+    console.log('No User');
+    document.getElementById('login').style.display = 'block';
+    document.getElementById('signout').style.display = 'none';
   }
-  console.log(getUserData(uid, 'id'));
-  console.log(getUserData(uid, 'username'));
-  console.log(getUserData(uid, 'email'));
-} else {
-  // User is signed out.
-  // ...
-  console.log('No User');
-}
 
 });
 
-function getUserData(userId, data) {
-  var res;
-  firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
-    res = (snapshot.val() && snapshot.val()[data]) || null;
-    // ...
-  });
-  return res;
+function fbData(path, obj, value) {
+  var firebasePath;
+  var endData;
+  if (value == undefined) {
+    firebasePath = firebase.database().ref(path + '/' + obj);
+    return firebasePath.once('value');
+  } else {
+    firebasePath = firebase.database().ref(path + '/');
+    return firebasePath.update({
+        [obj]: value
+      });
+  }
 }
