@@ -60,14 +60,14 @@ firebase.auth().onAuthStateChanged(function(u) {
     document.getElementById('login').style.display = 'none';
     document.getElementById('signout').style.display = 'block';
 
-    fbData('/users/' + user.uid, 'id').then(function(data) {
+    fbData('/users/' + user.uid + '/userData', 'id').then(function(data) {
       var id = data.val();
       if (id == undefined) {
         id = prompt('Please enter your student ID number');
-        fbData('/users/' + user.uid, 'id', id);
-        fbData('/users/' + user.uid, 'username', user.username);
-        fbData('/users/' + user.uid, 'email', user.email);
-        fbData('/users/' + user.uid, 'role', 'student');
+        fbData('/users/' + user.uid + '/userData', 'id', id);
+        fbData('/users/' + user.uid + '/userData', 'username', user.username);
+        fbData('/users/' + user.uid + '/userData', 'email', user.email);
+        fbData('/users/' + user.uid + '/userData', 'role', 'student');
       }
     });
   } else {
