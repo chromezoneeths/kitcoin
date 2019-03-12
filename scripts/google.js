@@ -65,8 +65,8 @@ firebase.auth().onAuthStateChanged(function(u) {
       if (id == undefined) {
         id = prompt('Please enter your student ID number');
         fbData('/users/' + user.uid, 'id', id);
-        fbData('/users/' + user.uid, 'id', user.username);
-        fbData('/users/' + user.uid, 'id', user.email);
+        fbData('/users/' + user.uid, 'username', user.username);
+        fbData('/users/' + user.uid, 'email', user.email);
       }
     });
   } else {
