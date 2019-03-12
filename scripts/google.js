@@ -63,7 +63,7 @@ firebase.auth().onAuthStateChanged(function(u) {
     fbData('/users/' + user.uid + '/userData', 'id').then(function(data) {
       var id = data.val();
       if (id == undefined) {
-        id = prompt('Please enter your student ID number');
+        id = prompt('Please enter your ETHS ID number');
         fbData('/users/' + user.uid + '/userData', 'id', id);
         fbData('/users/' + user.uid + '/userData', 'username', user.username);
         fbData('/users/' + user.uid + '/userData', 'email', user.email);
