@@ -67,6 +67,7 @@ firebase.auth().onAuthStateChanged(function(u) {
         fbData('/users/' + user.uid, 'id', id);
         fbData('/users/' + user.uid, 'username', user.username);
         fbData('/users/' + user.uid, 'email', user.email);
+        fbData('/users/' + user.uid, 'role', 'student');
       }
     });
   } else {
