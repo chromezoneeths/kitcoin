@@ -70,6 +70,15 @@ firebase.auth().onAuthStateChanged(function(u) {
         fbData('/users/' + user.uid + '/userData', 'role', 'student');
       }
     });
+	fbData('/users/' + user.uid + '/restricted', 'kitCoin').then(function(coin) {
+		fbData('/users/' + user.uid + '/userData', 'role').then(function(role) {
+			document.getElementById(role).style.display = '';
+			document.getElementById(role + '-name').innerHTML = user.name;
+			if (role == 'student' {
+				document.getElementById('student-name').innerHTML = coin;
+			}
+		});
+	});
   } else {
     // User is signed out.
     // ...
