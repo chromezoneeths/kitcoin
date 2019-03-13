@@ -74,7 +74,7 @@ firebase.auth().onAuthStateChanged(function(u) {
 		fbData('/users/' + user.uid + '/userData', 'role').then(function(role) {
 			document.getElementById(role).style.display = '';
 			document.getElementById(role + '-name').innerHTML = user.name;
-			if (role == 'student' {
+			if (role == 'student') {
 				document.getElementById('student-name').innerHTML = coin;
 			}
 		});
