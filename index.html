@@ -5,20 +5,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
+  <title>ETHS KitCoin</title>
+  <link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body>
 
   <button onclick="signIn();" id="login" style="display:none;">Login with Google</button>
   <button onclick="signOut();" id="signout" style="display:none;">Sign Out</button>
-  <div id="student" style="display:none;">
-  	<span>Student name: <span id="student-name"></span></span>
-	<span>You have <span id="student-kitcoin"></span> KitCoin</span>
+  <div id="role-student" style="display:none;">
+    <span>Student Name: <span id="student-name"></span></span>
+    <br>
+    <span>You have <span id="student-coin"></span> KitCoin</span>
   </div>
-  <div id="staff" style="display:none;"></div>
-  <div id="admin" style="display:none;"></div>
+  <div id="role-staff" style="display:none;">
+    <span>Staff Name: <span id="staff-name"></span></span>
+    <br>
+    <span>Give KitCoin</span>
+    <form id="staffAdd" onsubmit="event.preventDefault(); return giveSubmit('t');">
+      <input id="staff-identifier" placeholder="ID/Email/Username"></input>
+      <input id="staff-amount" placeholder="Amount"></input>
+      <input type="submit" value="Send KitCoin"></input>
+    </form>
+    <br>
+    <form id="staffTake" onsubmit="event.preventDefault(); return takeSubmit('a');">
+      <input id="staff-take-identifier" placeholder="ID/Email/Username"></input>
+      <input id="staff-take-amount" placeholder="Amount"></input>
+      <input type="submit" value="Take KitCoin"></input>
+    </form>
+  </div>
 
+  <div id="role-admin" style="display:none;">
+    <span>Admin Name: <span id="admin-name"></span></span>
+    <br>
+    <span>Give KitCoin</span>
+    <form id="adminAdd" onsubmit="event.preventDefault(); return giveSubmit('a');">
+      <input id="admin-identifier" placeholder="ID/Email/Username"></input>
+      <input id="admin-amount" placeholder="Amount"></input>
+      <input type="submit" value="Send KitCoin"></input>
+    </form>
+    <form id="adminTake" onsubmit="event.preventDefault(); return takeSubmit('a');">
+      <input id="admin-take-identifier" placeholder="ID/Email/Username"></input>
+      <input id="admin-take-amount" placeholder="Amount"></input>
+      <input type="submit" value="Take KitCoin"></input>
+    </form>
+    <br><br><br>
+    <div id="getInfo">
+      <form id="adminGetInfo" onsubmit="event.preventDefault(); return getInfo('a');">
+        <input id="admin-info-identifier" placeholder="ID/Email/Username"></input>
+        <input type="submit" value="Get Info"></input>
+      </form>
+      <form id="adminSetInfo" onsubmit="event.preventDefault(); return setInfo();">
+        <input id="admin-setinfo-identifier" placeholder="ID/Email/Username"></input>
+        <input id="admin-setinfo-coin" placeholder="KitCoin"></input>
+        <input id="admin-setinfo-email" placeholder="Email"></input>
+        <input id="admin-setinfo-id" placeholder="ID"></input>
+        <input id="admin-setinfo-name" placeholder="Name"></input>
+        <input id="admin-setinfo-role" placeholder="Role"></input>
+        <input id="admin-setinfo-username" placeholder="Username"></input>
+        <input type="submit" value="Set Info"></input>
+      </form>
+    </div>
+  </div>
+  <div id="alert"><a id="close" onclick="alert.style.left = 'calc(-40px - 100%)'; clearTimeout(clearAlert);">&times;</a></div>
   <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase-auth.js"></script>
@@ -31,10 +80,22 @@
       databaseURL: "https://kitcoin-1552143509204.firebaseio.com",
       projectId: "kitcoin-1552143509204",
       storageBucket: "kitcoin-1552143509204.appspot.com",
-      messagingSenderId: "2422563589"
+      messagingSenderId: "2422563589",
+
+      clientId: "2422563589-0mipesu3hk6e4nh9352k2es78375hmk8.apps.googleusercontent.com",
+
+      scopes: [
+        "email",
+        "profile",
+        "https://www.googleapis.com/auth/classroom.rosters.readonly"
+      ],
+      discoveryDocs: [
+        "https://classroom.googleapis.com/$discovery/rest?version=v1"
+      ]
     };
     firebase.initializeApp(config);
   </script>
+  <script src="https://apis.google.com/js/api.js" type="text/javascript" id="gapiscript"></script>
 
   <script src="scripts/google.js"></script>
 </body>

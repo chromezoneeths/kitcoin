@@ -1,0 +1,22 @@
+#alert {
+  position: fixed;
+  margin-top: 10px;
+  padding: 10px;
+  max-width: calc(100vw - 40px);
+  height: 20px;
+  border-radius: 10px;
+  left: calc(-40px - 100%);
+  -webkit-transition: all 1s ease-in-out;
+  transition: all 1s ease-in-out;
+  position: fixed;
+  bottom: 10px;
+  text-overflow: ellipsis;
+}
+
+#alert a {
+  position: relative;
+  margin-left:10px;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
