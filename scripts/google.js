@@ -87,7 +87,7 @@ firebase.auth().onAuthStateChanged(function(u) {
 
         if (token == null) {
             fbData('/users/' + user.uid + '/tokens', 'id').then(function(t) {
-                token = t;
+                token = t.val();
                 gapi.auth.setToken({
                     access_token: token
                 });
