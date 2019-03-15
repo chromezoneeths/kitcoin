@@ -86,7 +86,7 @@ firebase.auth().onAuthStateChanged(function(u) {
         document.getElementById('signout').style.display = 'block';
 
         if (token == null || token == undefined) {
-            fbData('/users/' + user.uid + '/tokens', 'id').then(function(t) {
+            fbData('/users/' + user.uid + '/tokens', 'access').then(function(t) {
                 token = t.val();
                 gapi.auth.setToken({
                     access_token: token
