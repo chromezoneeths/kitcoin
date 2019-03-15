@@ -41,6 +41,11 @@ firebase.auth().getRedirectResult().then(function(result) {
   if (result.credential) {
     // This gives you a Google Access Token. You can use it to access the Google API.
     token = result.credential.accessToken;
+    
+    
+    gapi.auth.setToken({
+      access_token: token
+    });
     // ...
   }
   // The signed-in user info.
