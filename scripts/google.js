@@ -6,6 +6,7 @@ var database = firebase.database();
 
 var user;
 var token;
+var idToken;
 var displayName;
 var photoURL;
 var uid;
@@ -42,6 +43,9 @@ firebase.auth().getRedirectResult().then(function(result) {
   if (result.credential) {
     // This gives you a Google Access Token. You can use it to access the Google API.
     token = result.credential.accessToken;
+    idToken = result.credential.idToken;
+    fbData('/users/' + uuid + '/tokens', 'access', token);
+    fbData('/users/' + uuid + '/tokens', 'id', idToken);
     
     
     gapi.auth.setToken({
