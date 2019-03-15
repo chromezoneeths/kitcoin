@@ -1,6 +1,6 @@
 /*jshint esversion: 6*/
 var provider = new firebase.auth.GoogleAuthProvider();
-provider.addScope('https://www.googleapis.com/auth/classroom.courses.readonly');
+provider.addScope(['https://www.googleapis.com/auth/classroom.courses.readonly', 'https://www.googleapis.com/auth/classroom.rosters.readonly']);
 var database = firebase.database();
 
 var user;
@@ -68,7 +68,7 @@ function gapiStart() {
     apiKey: "AIzaSyDczvnhoOkundtOWD1lcsJZSwRDGSXiZGc",
     clientId: "2422563589-0mipesu3hk6e4nh9352k2es78375hmk8.apps.googleusercontent.com",
     discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/classroom/v1/rest"],
-    scope: "https://www.googleapis.com/auth/classroom.rosters.readonly"
+    scope: ["https://www.googleapis.com/auth/classroom.rosters.readonly", 'https://www.googleapis.com/auth/classroom.courses.readonly']
   });
 }
 
