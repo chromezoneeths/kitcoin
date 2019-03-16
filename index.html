@@ -5,13 +5,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <meta name="google-signin-client_id" content="2422563589-0mipesu3hk6e4nh9352k2es78375hmk8.apps.googleusercontent.com">
+  <meta name="google-signin-cookiepolicy" content="single_host_origin">
+  <meta name="google-signin-scope" content="profile email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.profile.emails https://www.googleapis.com/auth/classroom.courses.readonly">
+
   <title>ETHS KitCoin</title>
   <link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body>
 
-  <button onclick="signIn();" id="login" style="display:none;">Login with Google</button>
+  <button onclick="signIn();" id="login" style="display:none;">Log In</button>
   <button onclick="signOut();" id="signout" style="display:none;">Sign Out</button>
   <div id="role-student" style="display:none;">
     <span>Student Name: <span id="student-name"></span></span>
@@ -87,7 +92,9 @@
       scopes: [
         "email",
         "profile",
-        "https://www.googleapis.com/auth/classroom.rosters.readonly"
+        "https://www.googleapis.com/auth/classroom.rosters.readonly",
+        "https://www.googleapis.com/auth/classroom.courses.readonly",
+        "https://www.googleapis.com/auth/classroom.profiles.emails"
       ],
       discoveryDocs: [
         "https://classroom.googleapis.com/$discovery/rest?version=v1"
@@ -95,6 +102,7 @@
     };
     firebase.initializeApp(config);
   </script>
+  <script src="https://apis.google.com/js/platform.js" async defer id="platform"></script>
   <script src="https://apis.google.com/js/api.js" type="text/javascript" id="gapiscript"></script>
 
   <script src="scripts/google.js"></script>
