@@ -3,10 +3,10 @@
 gapi.load('auth2', function() {
   auth2 = gapi.auth2.init({
     client_id: '2422563589-0mipesu3hk6e4nh9352k2es78375hmk8.apps.googleusercontent.com',
-    scope: 'profile email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly',
-    ux_mode: 'redirect'
+    scope: 'profile email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly'
+
   });
-  auth2.attachClickHandler(document.getElementById('login'), {});
+  auth2.attachClickHandler(document.getElementById('login'), {}, onSignIn);
 
 });
 
@@ -53,17 +53,21 @@ function signOut() {
 
 
 function onSignIn(googleUser) {
-
+  console.log(googleUser);
+  var options = new gapi.auth2.SigninOptionsBuilder({
+    'scope': 'email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly'
+  });
+  googleUser.grant(options);
   console.log('Google Auth Response', googleUser);
   googleuser = googleUser;
-  // We need to register an Observer on Firebase Auth to make sure auth is initialized.
+  // Check if we are already signed-in Firebase with the correct user.
   var unsubscribe = firebase.auth().onAuthStateChanged(function(firebaseUser) {
     unsubscribe();
     // Check if we are already signed-in Firebase with the correct user.
     if (!isUserEqual(googleUser, firebaseUser)) {
       // Build Firebase credential with the Google ID token.
       var credential = firebase.auth.GoogleAuthProvider.credential(
-        googleUser.getAuthResponse().id_token);
+          googleUser.getAuthResponse().id_token);
       // Sign in with credential from the Google user.
       firebase.auth().signInAndRetrieveDataWithCredential(credential).catch(function(error) {
         // Handle Errors here.
