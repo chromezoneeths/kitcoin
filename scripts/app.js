@@ -1,32 +1,7 @@
 /*jshint esversion: 6, loopfunc: true*/
 
-gapi.load('auth2', function() {
-  auth2 = gapi.auth2.init({
-    client_id: '2422563589-0mipesu3hk6e4nh9352k2es78375hmk8.apps.googleusercontent.com',
-    scope: 'profile email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly'
 
-  });
-  auth2.attachClickHandler(document.getElementById('login'), {}, onSignIn);
-
-});
-
-window.onload = function() {
-  if (!auth2.isSignedIn.get()) {
-    document.getElementById('login').style.display = 'block';
-    document.getElementById('signout').style.display = 'none';
-  } else {
-
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('signout').style.display = 'block';
-  }
-};
-
-var provider = new firebase.auth.GoogleAuthProvider();
-provider.addScope('https://www.googleapis.com/auth/classroom.courses.readonly');
-provider.addScope('https://www.googleapis.com/auth/classroom.rosters.readonly');
-provider.addScope('https://www.googleapis.com/auth/classroom.profiles.emails');
-var database = firebase.database();
-
+//Variables
 var user;
 var token;
 var idToken;
@@ -38,7 +13,43 @@ var email;
 var currentRole;
 
 var googleuser;
+//GAPI setup for auth
+gapi.load('auth2', function() {
+  auth2 = gapi.auth2.init({
+    client_id: '2422563589-0mipesu3hk6e4nh9352k2es78375hmk8.apps.googleusercontent.com',
+    scope: 'profile email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly'
 
+  });
+  auth2.attachClickHandler(document.getElementById('login'), {}, onSignIn);
+
+  auth2.isSignedIn.listen(signinChanged);
+  auth2.currentUser.listen(userChanged);
+});
+//Update user when changed
+var userChanged = function(u) {
+  if (u.getId()) {
+    user = firebase.auth().currentUser;
+  }
+};
+//Change sign in button state when sign sign in state changed
+function signinChanged(v) {
+  if (!v) {
+    document.getElementById('landing').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+  } else {
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
+}
+
+// Firebase setup
+var provider = new firebase.auth.GoogleAuthProvider();
+provider.addScope('https://www.googleapis.com/auth/classroom.courses.readonly');
+provider.addScope('https://www.googleapis.com/auth/classroom.rosters.readonly');
+provider.addScope('https://www.googleapis.com/auth/classroom.profiles.emails');
+var database = firebase.database();
+
+//Sign Out Funcition
 function signOut() {
   auth2.signOut().then(function() {
     console.log('User signed out.');
@@ -51,23 +62,22 @@ function signOut() {
 }
 
 
-
+//Runs when user is signed in
 function onSignIn(googleUser) {
-  console.log(googleUser);
   var options = new gapi.auth2.SigninOptionsBuilder({
     'scope': 'email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly'
   });
   googleUser.grant(options);
-  console.log('Google Auth Response', googleUser);
   googleuser = googleUser;
-  // Check if we are already signed-in Firebase with the correct user.
+
+  //Link with firebase user
   var unsubscribe = firebase.auth().onAuthStateChanged(function(firebaseUser) {
     unsubscribe();
     // Check if we are already signed-in Firebase with the correct user.
     if (!isUserEqual(googleUser, firebaseUser)) {
       // Build Firebase credential with the Google ID token.
       var credential = firebase.auth.GoogleAuthProvider.credential(
-          googleUser.getAuthResponse().id_token);
+        googleUser.getAuthResponse().id_token);
       // Sign in with credential from the Google user.
       firebase.auth().signInAndRetrieveDataWithCredential(credential).catch(function(error) {
         // Handle Errors here.
@@ -85,6 +95,7 @@ function onSignIn(googleUser) {
   });
 }
 
+//function for above
 function isUserEqual(googleUser, firebaseUser) {
   if (firebaseUser) {
     var providerData = firebaseUser.providerData;
@@ -98,7 +109,7 @@ function isUserEqual(googleUser, firebaseUser) {
   }
   return false;
 }
-
+//NOT USED ANYMORE
 firebase.auth().getRedirectResult().then(function(result) {
   if (result.credential) {
     // This gives you a Google Access Token. You can use it to access the Google API.
@@ -124,22 +135,17 @@ firebase.auth().getRedirectResult().then(function(result) {
   // ...
 });
 
-gapi.load('client', gapiStart);
-
-function gapiStart() {
-
-}
-
-
+//Runs when user is signed in and state is changed
 firebase.auth().onAuthStateChanged(function(u) {
-  console.log('u: ' + u);
   if (u) {
-
+    //set global user variabled
     user = u;
 
-
+    //set GAPI stuff
     gapi.auth2.getAuthInstance();
 
+    //Check if student id is set
+    //if not, ask for id and put info in database
     fbData('/users/' + user.uid + '/userData', 'id').then(function(data) {
       var id = data.val();
       if (id == undefined) {
@@ -160,7 +166,7 @@ firebase.auth().onAuthStateChanged(function(u) {
       fbData('/users/' + user.uid + '/userData', 'role').then(function(role) {
         currentRole = role.val();
         document.getElementById('role-' + role.val()).style.display = '';
-        document.getElementById(role.val() + '-name').innerHTML = user.displayName;
+        document.getElementById('user-name').innerHTML = user.displayName;
         if (role.val() == 'student') {
           document.getElementById('student-coin').innerHTML = coin.val();
         }
@@ -168,13 +174,20 @@ firebase.auth().onAuthStateChanged(function(u) {
     });
   } else {
     // User is signed out.
-    // ...
     console.log('No User');
+
+    if (document.getElementById('app').style.display !== 'block') {
+      document.getElementById('other').style.display = '';
+      document.getElementById('loginwrapper').style.display = '';
+    }
 
   }
 
 });
 
+//Runs when the give function is run
+
+//step 1a
 function giveSubmit(where) {
   if (where == 'a') {
     giveCoin(document.getElementById('admin-identifier').value, document.getElementById('admin-amount').value);
@@ -184,6 +197,9 @@ function giveSubmit(where) {
   return false;
 }
 
+//Runs when the take function is run
+
+//step 1b
 function takeSubmit(where) {
   if (where == 'a') {
     giveCoin(document.getElementById('admin-take-identifier').value, 0 - parseInt(document.getElementById('admin-take-amount').value));
@@ -193,6 +209,44 @@ function takeSubmit(where) {
   return false;
 }
 
+//step two
+function giveCoin(identifier, quantity) {
+  var lookupType;
+  if (identifier.length == 6 && typeof parseInt(identifier) == 'number') {
+    lookupType = 'id';
+  } else if (identifier.indexOf('@eths202.org') !== -1) {
+    lookupType = 'username';
+    identifier = identifier.split('@')[0];
+  } else {
+    lookupType = 'username';
+  }
+  fbData('/lookup/' + lookupType, identifier).then(function(data) {
+    var uuid = data.val();
+    if (uuid !== null) {
+      addCoin(uuid, quantity);
+    } else {
+      displayAlert('Cannot find a user with the given information.', '#f44336', 4);
+    }
+  });
+}
+
+//step three
+function addCoin(uuid, quantity) {
+  fbData('/users/' + uuid + '/restricted', 'kitCoin').then(function(data) {
+    if (data.val() !== null) {
+      fbData('/users/' + uuid + '/restricted', 'kitCoin', parseInt(data.val()) + parseInt(quantity));
+      fbData('/users/' + uuid + '/userData', 'name').then(function(data2) {
+        displayAlert('Sent ' + numberWithCommas(quantity) + ' KitCoin to ' + data2.val() + '. ' + data2.val().split(' ')[0] + ' now has ' + numberWithCommas(parseInt(data.val()) + parseInt(quantity)) + ' KitCoin', '#2196fe', 4);
+      });
+    } else {
+      displayAlert('Cannot find a user with the given information.', '#f44336', 4);
+    }
+  });
+}
+
+//Gets the user info when the funcion is run
+
+//step one
 function getInfo(where) {
   if (where == 'a') {
     getUserInfo(document.getElementById('admin-info-identifier').value);
@@ -202,6 +256,7 @@ function getInfo(where) {
   return false;
 }
 
+//step two
 function getUserInfo(identifier) {
   var lookupType;
   if (identifier.length == 6 && typeof parseInt(identifier) == 'number') {
@@ -222,6 +277,7 @@ function getUserInfo(identifier) {
   });
 }
 
+//step 3
 function searchInfo(uuid) {
   fbData('/users/', uuid).then(function(data) {
     if (data.val() !== null) {
@@ -251,6 +307,9 @@ function searchInfo(uuid) {
   });
 }
 
+// Runs when set info is run
+
+//step one
 function setInfo() {
   var identifier = document.getElementById('admin-setinfo-identifier').value;
   var lookupType;
@@ -272,6 +331,7 @@ function setInfo() {
   });
 }
 
+//step two
 function setUserInfo(uuid) {
   if (document.getElementById('admin-setinfo-coin').value !== '') {
     fbData('/users/' + uuid + '/restricted', 'kitCoin', parseInt(document.getElementById('admin-setinfo-coin').value));
@@ -297,39 +357,8 @@ function setUserInfo(uuid) {
 }
 
 
-function giveCoin(identifier, quantity) {
-  var lookupType;
-  if (identifier.length == 6 && typeof parseInt(identifier) == 'number') {
-    lookupType = 'id';
-  } else if (identifier.indexOf('@eths202.org') !== -1) {
-    lookupType = 'username';
-    identifier = identifier.split('@')[0];
-  } else {
-    lookupType = 'username';
-  }
-  fbData('/lookup/' + lookupType, identifier).then(function(data) {
-    var uuid = data.val();
-    if (uuid !== null) {
-      addCoin(uuid, quantity);
-    } else {
-      displayAlert('Cannot find a user with the given information.', '#f44336', 4);
-    }
-  });
-}
 
-function addCoin(uuid, quantity) {
-  fbData('/users/' + uuid + '/restricted', 'kitCoin').then(function(data) {
-    if (data.val() !== null) {
-      fbData('/users/' + uuid + '/restricted', 'kitCoin', parseInt(data.val()) + parseInt(quantity));
-      fbData('/users/' + uuid + '/userData', 'name').then(function(data2) {
-        displayAlert('Sent ' + numberWithCommas(quantity) + ' KitCoin to ' + data2.val() + '. ' + data2.val().split(' ')[0] + ' now has ' + numberWithCommas(parseInt(data.val()) + parseInt(quantity)) + ' KitCoin', '#2196fe', 4);
-      });
-    } else {
-      displayAlert('Cannot find a user with the given information.', '#f44336', 4);
-    }
-  });
-}
-
+//guiding function for firebase database operations
 function fbData(path, obj, value) {
   var firebasePath;
   var endData;
@@ -346,6 +375,8 @@ function fbData(path, obj, value) {
 var clearAlert;
 var alert = document.getElementById('alert');
 
+
+//displays toast
 function displayAlert(txt, bg, duration) {
   alert.innerHTML = txt + `<a id="close" onclick="alert.style.left = 'calc(-40px - 100%)'; clearTimeout(clearAlert);">&times;</a>`;
   alert.style.backgroundColor = bg;
@@ -355,13 +386,17 @@ function displayAlert(txt, bg, duration) {
   }, duration * 1000 + 500);
 }
 
+//commaify number
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+
+//get class list
 var classList;
 var classroomId;
 
+//step 1
 function getClassList() {
   gapi.client.classroom.userProfiles.get({
     userId: 'me'
@@ -377,6 +412,7 @@ function getClassList() {
 var teacherArrayStudent = [];
 var teacherArrayStaff = [];
 
+//step 2
 function isUserStudent(classList) {
   var currentStarter;
   for (var i = 0; i < classList.length; i++) {
@@ -385,7 +421,6 @@ function isUserStudent(classList) {
         courseId: classList[i].id
       }).then(function(res) {
         var currentClass = res.result.teachers[0].courseId;
-        console.log(currentClass);
         var currentTeachers = res.result.teachers;
         var currentUserIds = [];
         for (var j = 0; j < currentTeachers.length; j++) {
@@ -404,3 +439,11 @@ function isUserStudent(classList) {
     }
   }
 }
+
+//Hide loading bar
+document.onreadystatechange = function() {
+  if (document.readyState === "complete") {
+    //document.getElementById('app').style.display = 'block';
+    document.getElementById("PreLoaderBar").style.display = "none";
+  }
+};
