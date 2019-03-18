@@ -150,7 +150,9 @@ firebase.auth().onAuthStateChanged(function(u) {
     //set global user variabled
     user = u;
     
-    getClassList();
+    gapi.client.load('classroom', {
+      callback: getClassList()
+    });
     
     if (user.email.split('@')[1] !== 'eths202.org') {
       firebase.auth().currentUser.delete();
