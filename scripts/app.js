@@ -141,6 +141,11 @@ firebase.auth().onAuthStateChanged(function(u) {
     //set global user variabled
     user = u;
 
+    if (user.email.split('@')[1] !== 'eths202.org') {
+      firebase.auth().currentUser.delete();
+      alert('Please log in with your @eths202.org email address. You logged in with the domain \"' + user.email.split('@')[1] + '\".');
+      signOut();
+    }
     //set GAPI stuff
     gapi.auth2.getAuthInstance();
 
