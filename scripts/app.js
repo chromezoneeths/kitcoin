@@ -414,9 +414,9 @@ var classroomId;
 
 //step 1
 function getClassList() {
-  gapi.client.load('classroom');
-
-  
+  gapi.client.load('classroom', getClassData());
+}
+function getClassData() { 
   gapi.client.classroom.userProfiles.get({
     userId: 'me'
   }).then(function(u) {
