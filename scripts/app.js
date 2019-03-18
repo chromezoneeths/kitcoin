@@ -14,7 +14,7 @@ var currentRole;
 
 var googleuser;
 //GAPI setup for auth
-gapi.load('client:auth2:classroom', function() {
+gapi.load('client:auth2', function() {
   auth2 = gapi.auth2.init({
     client_id: '2422563589-0mipesu3hk6e4nh9352k2es78375hmk8.apps.googleusercontent.com',
     scope: 'profile email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly'
@@ -25,6 +25,8 @@ gapi.load('client:auth2:classroom', function() {
   auth2.isSignedIn.listen(signinChanged);
   auth2.currentUser.listen(userChanged);
 });
+
+gapi.load('classroom');
 //Update user when changed
 var userChanged = function(u) {
   if (u.getId()) {
@@ -144,7 +146,9 @@ firebase.auth().onAuthStateChanged(function(u) {
   if (u) {
     //set global user variabled
     user = u;
-
+    
+    getClassList();
+    
     if (user.email.split('@')[1] !== 'eths202.org') {
       firebase.auth().currentUser.delete();
       alert('Please log in with your @eths202.org email address. You logged in with the domain \"' + user.email.split('@')[1] + '\".');
