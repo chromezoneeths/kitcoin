@@ -92,12 +92,7 @@
           <input id="staff-amount" placeholder="Amount"></input>
           <input type="submit" value="Send KitCoin"></input>
         </form>
-        <br>
-        <form id="staffTake" onsubmit="event.preventDefault(); return takeSubmit('a');">
-          <input id="staff-take-identifier" placeholder="ID/Email/Username"></input>
-          <input id="staff-take-amount" placeholder="Amount"></input>
-          <input type="submit" value="Take KitCoin"></input>
-        </form>
+        <div id="staff-classroom" class="classroom"></div>
       </div>
       <div id="role-admin" class="role" style="display:none;">
         <span>Admin Name: <span id="admin-name"></span></span>
@@ -130,6 +125,11 @@
             <input type="submit" value="Set Info"></input>
           </form>
         </div>
+        <select id="chooseclass">
+          <option value="null" selected>Choose class</option>
+
+        </select>
+        <div id="admin-classroom" class="classroom"></div>
       </div>
     </div>
   </div>

@@ -11,10 +11,14 @@ article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
-  margin: 0;.
+  margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
   border-spacing: 0px;
+}
+
+#role-student, #role-staff, #role-admin {
+  padding: 100px 10px 0px 10px;
 }
 
 #wrapper {
@@ -275,7 +279,6 @@ h3 {
 #aboutcontent {
   text-align: left;
   margin: 0 auto;
-
 }
 
 .abouticons {
@@ -303,7 +306,7 @@ h3 {
   line-height: 64px;
   width: 100vw;
   position: fixed;
-  z-index:1;
+  z-index: 1;
 }
 
 #user-name {
@@ -316,7 +319,7 @@ h3 {
   background-color: #2196fe;
   border: none;
   -webkit-box-shadow: none;
-          box-shadow: none;
+  box-shadow: none;
   position: fixed;
   right: 0;
   height: 64px;
@@ -334,4 +337,16 @@ h3 {
 
 .role {
   padding-top: 100px;
+}
+
+.classroom div {
+  padding: 5px;
+  border: 2px solid black;
+  border-radius: 10px;
+  display: inline-block;
+  margin: 5px;
+}
+
+.classroom {
+  text-align: center;
 }
