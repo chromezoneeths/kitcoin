@@ -78,6 +78,8 @@ function onSignIn(googleUser) {
       // Build Firebase credential with the Google ID token.
       var credential = firebase.auth.GoogleAuthProvider.credential(
         googleUser.getAuthResponse().id_token);
+      gapi.client.setToken(googleUser.getAuthResponse().id_token);
+
       // Sign in with credential from the Google user.
       firebase.auth().signInAndRetrieveDataWithCredential(credential).catch(function(error) {
         // Handle Errors here.
