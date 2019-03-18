@@ -14,7 +14,7 @@ var currentRole;
 
 var googleuser;
 //GAPI setup for auth
-gapi.load('auth2', function() {
+gapi.load('client:auth2', function() {
   auth2 = gapi.auth2.init({
     client_id: '2422563589-0mipesu3hk6e4nh9352k2es78375hmk8.apps.googleusercontent.com',
     scope: 'profile email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly'
