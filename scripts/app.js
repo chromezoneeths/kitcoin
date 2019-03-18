@@ -423,12 +423,7 @@ var classroomId;
 
 //step 1
 function getClassList() {
-    gapi.client.load('classroom', {
-        callback: getClassData()
-    });
-}
 
-function getClassData() {
     gapi.client.classroom.userProfiles.get({
         userId: 'me'
     }).then(function(u) {
