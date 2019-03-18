@@ -183,8 +183,6 @@ firebase.auth().onAuthStateChanged(function(u) {
                 fbData('/users/' + user.uid + '/restricted', 'kitCoin', 0);
                 fbData('/lookup/id/', id, user.uid);
                 fbData('/lookup/username/', user.email.split('@')[0], user.uid);
-                
-                getClassList();
             }
         });
         fbData('/users/' + user.uid + '/restricted', 'kitCoin').then(function(coin) {
@@ -195,6 +193,8 @@ firebase.auth().onAuthStateChanged(function(u) {
                 if (role.val() == 'student') {
                     document.getElementById('student-coin').innerHTML = coin.val();
                 }
+                
+                getClassList();
             });
         });
     } else {
