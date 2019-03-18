@@ -22,7 +22,7 @@ gapi.load('client:auth2', function() {
   });
   
   
-  gapi.load('classroom');
+  gapi.client.load('classroom');
 
   auth2.attachClickHandler(document.getElementById('login'), {}, onSignIn);
 
@@ -414,7 +414,7 @@ var classroomId;
 
 //step 1
 function getClassList() {
-  gapi.load('classroom');
+  gapi.client.load('classroom');
 
   
   gapi.client.classroom.userProfiles.get({
