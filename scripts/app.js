@@ -20,13 +20,16 @@ gapi.load('client:auth2', function() {
     scope: 'profile email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.courses.readonly'
 
   });
+  
+  
+  gapi.load('classroom');
+
   auth2.attachClickHandler(document.getElementById('login'), {}, onSignIn);
 
   auth2.isSignedIn.listen(signinChanged);
   auth2.currentUser.listen(userChanged);
 });
 
-gapi.load('classroom');
 //Update user when changed
 var userChanged = function(u) {
   if (u.getId()) {
@@ -411,6 +414,9 @@ var classroomId;
 
 //step 1
 function getClassList() {
+  gapi.load('classroom');
+
+  
   gapi.client.classroom.userProfiles.get({
     userId: 'me'
   }).then(function(u) {
