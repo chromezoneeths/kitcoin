@@ -9,16 +9,17 @@ fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
+menu, nav, output, main, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto Slab', serif;
   border-spacing: 0px;
+  box-sizing: border-box;
 }
 
 #role-student, #role-staff, #role-admin {
-  padding: 100px 10px 0px 10px;
+  padding: 100px 0 0 0;
 }
 
 #wrapper {
@@ -192,42 +193,41 @@ h3 {
   font-size: 12px;
 }
 
-#title h1 {
-  text-align: center;
-  vertical-align: middle;
-}
-
-#title h2 {
-  text-align: center;
-  vertical-align: middle;
-}
-
-#title h3 {
-  text-align: center;
-  vertical-align: middle;
-}
-
-#title {
-  padding: 10px;
-  border: 2px solid #1a2741;
-  width: 75vw;
-  max-width: 500px;
-  margin: auto;
-}
-
-#title tbody {
-  width: 75vw;
-  max-width: 250px;
-  margin: auto;
-}
 
 #headermain {
   width: 100vw;
   height: 100vh;
 }
 
-#login {
-  margin-top: 3vh;
+hr {
+  border: none;
+  height: 3px;
+  background-color: #fff; /* Modern Browsers */
+}
+
+#infobox {
+  width: 400px;
+  height: 70vh;
+  position: absolute;
+  top: 15vh;
+  left: 80px;
+  background: rgba(38,37,81,.75);
+  border-radius: 22px;
+  padding: 40px;
+  color: white;
+}
+
+#infobox h1 {
+  font-size: 70px;
+}
+
+#infobox h2 {
+  margin: 40px 0;
+  font-size: 30px;
+}
+
+.login {
+  margin-top: 2vh;
   display: inline-block;
   background: white;
   color: #444;
@@ -241,25 +241,25 @@ h3 {
   transition: all .5s ease-in-out;
 }
 
-#login:hover {
+.login:hover {
   cursor: pointer;
   -webkit-box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
-#login span.label {
+.login span.label {
   font-family: serif;
   font-weight: normal;
 }
 
-#login img.icon {
+.login img.icon {
   display: inline-block;
   vertical-align: middle;
   width: auto;
   height: 90%;
 }
 
-#login span.buttonText {
+.login span.buttonText {
   display: inline-block;
   vertical-align: middle;
   font-size: 14px;
@@ -268,7 +268,21 @@ h3 {
   font-family: 'Roboto', sans-serif;
 }
 
-#loginwrapper {
+#sidelogo {
+  position: absolute;
+  width: 400px;
+  height: 100vh;
+  top: 0;
+  right: 120px;
+}
+
+#sidelogo img {
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.loginwrapper {
   text-align: center;
 }
 
@@ -297,6 +311,14 @@ h3 {
     float: left;
     padding-right: 3vw;
   }
+}
+
+main {
+  position: relative;
+  left: 5vw;
+  width: 90vw;
+  padding: 20px;
+  background: #eee;
 }
 
 #navbar {

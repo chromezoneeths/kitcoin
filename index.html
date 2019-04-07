@@ -15,7 +15,7 @@
 
   <title>ETHS KitCoin</title>
   <link rel="stylesheet" href="styles/style.css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto|Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab|Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
 </head>
@@ -24,24 +24,21 @@
   <div id="wrapper">
     <table id="landing" style="overflow-y: hidden;">
       <tbody>
-        <tr>
+        <tr id="header" class="section">
           <td id="header" class="section">
-            <table id="title">
-              <tbody>
-                <tr>
-                  <td>
-                    <h2><i class="far fa-money-bill-alt"></i></h2>
-                    <h1>KitCoin</h1>
-                    <h3>by codETHS</h3>
-                  <td>
-                </tr>
-              </tbody>
-            </table>
-            <div id="loginwrapper" style="display:none;">
-              <button id="login">
-                <img class="icon" src="images/google-logo.png"></img>
-                <span class="buttonText">Log in with Google</span>
-              </button>
+            <div id="infobox">
+              <h1>KitCoin</h1><hr>
+              <h2>ETHS’s own digital currency for incentives, discounts and more...</h2>
+              <p style="text-align: center; margin: -2vh 0 2vh 0">Created by codETHS</p>
+              <div class="loginwrapper">
+                <button class="login">
+                  <img class="icon" src="images/google-logo.png"></img>
+                  <span class="buttonText">Log in with Google</span>
+                </button>
+              </div>
+            </div>
+            <div id="sidelogo">
+              <img src="images/coinlogo.png"></img>
             </div>
           </td>
         </tr>
@@ -71,6 +68,12 @@
                 </tr>
               </tbody>
             </table>
+              <div class="loginwrapper">
+                <button class="login">
+                  <img class="icon" src="images/google-logo.png"></img>
+                  <span class="buttonText">Log in with Google</span>
+                </button>
+              </div>
           </td>
         </tr>
       </tbody>
@@ -78,26 +81,32 @@
     <div class="progress" id="PreLoaderBar">
       <div class="indeterminate"></div>
     </div>
-    <div id="app" style="display:none">
+
+    <div id="app" style="display:none;">
       <div id="navbar">
         <span id="user-name"></span>
         <button onclick="signOut();" id="signout">Log Out</button>
       </div>
-      <div id="role-student" class="role" style="display:none;">
-        <span>You have <span id="student-coin"></span> KitCoin</span>
+      <div id="role-student" class="role" style="display:none">
+        <main>
+          <span>You have <span id="student-coin"></span> KitCoin</span>
+        </main>
       </div>
       <div id="role-staff" class="role" style="display:none;">
-        <span>Staff Name: <span id="staff-name"></span></span>
-        <br>
-        <span>Give KitCoin</span>
-        <form id="staffAdd" onsubmit="event.preventDefault(); return giveSubmit('t');">
-          <input id="staff-identifier" placeholder="ID/Email/Username"></input>
-          <input id="staff-amount" placeholder="Amount"></input>
-          <input type="submit" value="Send KitCoin"></input>
-        </form>
-        <div id="staff-classroom" class="classroom"></div>
+        <main>
+          <span>Staff Name: <span id="staff-name"></span></span>
+          <br>
+          <span>Give KitCoin</span>
+          <form id="staffAdd" onsubmit="event.preventDefault(); return giveSubmit('t');">
+            <input id="staff-identifier" placeholder="ID/Email/Username"></input>
+            <input id="staff-amount" placeholder="Amount"></input>
+            <input type="submit" value="Send KitCoin"></input>
+          </form>
+          <div id="staff-classroom" class="classroom"></div>
+        </main>
       </div>
       <div id="role-admin" class="role" style="display:none;">
+        <main>
         <span>Admin Name: <span id="admin-name"></span></span>
         <br>
         <span>Give KitCoin</span>
@@ -134,6 +143,7 @@
         </select>
         <div id="admin-classroom" class="classroom"></div>
       </div>
+      </main>
     </div>
   </div>
   <div id="alert"><a id="close" onclick="alert.style.left = 'calc(-40px - 100%)'; clearTimeout(clearAlert);">&times;</a></div>
