@@ -1,6 +1,6 @@
 # KitCoin Final Project
 
 Language: NodeJS
-  Dependencies: Express
+Dependencies: Express
   
 Database: MongoDB
