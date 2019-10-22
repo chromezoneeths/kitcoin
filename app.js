@@ -21,6 +21,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+const google = require('./google.js')
+const fs = require('fs');
+const oauthRouter = express.Router()
+oauthRouter.get('/oauthstage1', (req,res,next)=>{
+  google.callback(req,res,'/oauthstage1')
+})
+oauthRouter.get('/oauthstage2', (req,res,next)=>{
+  google.callback(req,res,'/oauthstage2')
+})
+oauthRouter.get('/oauthstage3', (req,res,next)=>{
+  console.log(req.url);
+  google.callback(req,res,req.url)
+})
+oauthRouter.get('/stage1.js', (req,res,next)=>{
+  res.end(fs.readFileSync('clientjs/stage1.js'))
+})
+oauthRouter.get('/stage2.js', (req,res,next)=>{
+  res.end(fs.readFileSync('clientjs/stage2.js'))
+})
+app.use('/oauth', oauthRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -38,11 +58,9 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
 
-// Bits added to the end for server things
+// Bits added to the end for the backend, probably awful and wrong.
 
-const google = require('./google.js')
 const googleapis = require('googleapis').google;
 const WebSocket = require('ws');
 const http = require('http');
@@ -50,21 +68,13 @@ const uuid = require('uuid/v4');
 const conf = require('./config')
 const db = require('./db');
 const ad = require('./admin');
-const oauthRouter = express.Router()
-oauthRouter.get('/', (req,res,next)=>{
-  google.callback(req,res)
-})
-app.use('/oauth', oauthRouter)
-const enableWs = require('express-ws')
-enableWs(app)
-app.ws('/',session)
 async function init(){
   await db.init().catch(r=>{console.log(`RECORDS, ERROR: Failed to connect to database. ${r}`);process.exit(1)})
 }
 init()
 
-async function session(ws) {
-  await sleep(200)
+async function session(ws, req) {
+  console.log("Got new connection");
   var auth = await google.prepare(ws)
   var peopleAPI = googleapis.people({
     version: 'v1',
@@ -88,7 +98,7 @@ async function session(ws) {
     admin = userQuery.role == 'admin'
   } else {
     userID = uuid()
-    admin = false // To make a user admin, run `UPDATE users SET admin=b'1' WHERE address='email';`
+    admin = false
     await db.addUser(userID, user.data.emailAddresses[0].value, user.data.names[0].displayName).catch(r => {
       console.log(`RECORDS, ERROR: ${r}`)
     })
@@ -262,3 +272,6 @@ async function session(ws) {
     console.log(`RECORDS, LOGGING: User ${name} has disconnected.`);
   })
 }
+
+module.exports.app = app;
+module.exports.wssessionmethod = session

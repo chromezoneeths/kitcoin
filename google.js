@@ -1,7 +1,7 @@
 // This file contains abstractions for Google APIs.
 const conf = require('./config') // gotta have them inconsistent semicolons amirite
 const uuid = require('uuid/v4');
-const url = require('url');
+const urllib = require('url');
 const oauthKeys = require('./oauth_info') // This won't be in the repository; make your own keys in the Google Developer Console.
 const oauthScopes = [
   'https://www.googleapis.com/auth/userinfo.email',
@@ -33,8 +33,9 @@ exports.prepare = (socket) => { // Blocks until user consents, otherwise doesn't
     }))
   })
 }
-exports.callback = async (req, res) => {
-  if(req.url.startsWith("/oauthstage1")){
+exports.callback = async (req, res, url) => {
+  console.log(`OAUTH ROUTER GET ${url}`);
+  if(url.startsWith("/oauthstage1")){
         res.writeHead(200)
         res.end(`<script src="stage1.js"></script>`)
         // const qs = new url.URL(req.url, conf.oauthCallbackUrl)
@@ -50,12 +51,12 @@ exports.callback = async (req, res) => {
         //   }
         // }
       }
-      else if(req.url.startsWith("/oauthstage2")){
+      else if(url.startsWith("/oauthstage2")){
         res.writeHead(200)
         res.end(`<script src="stage2.js"></script>`)
       }
-      else if(req.url.startsWith("/oauthstage3")){
-        const qs = new url.URL(req.url, conf.oauthCallbackUrl)
+      else if(url.startsWith("/oauthstage3")){
+        const qs = new urllib.URL(url, conf.oauthCallbackUrl)
               .searchParams;
         for(var i in pendingOAuthCallbacks){
           if(pendingOAuthCallbacks[i].id == qs.get(`uuid`)){

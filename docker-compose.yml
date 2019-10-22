@@ -14,12 +14,12 @@ services:
     links:
       - "mongodb"
     environment:
-      - DATABASE_ADDRESS=mongodb://kitcoinnode_mongodb_1
-      - DATABASE_USER=kitcoin
-      - DATABASE_PORT=33060
-      - DATABASE_PASSWORD=please-change-this
-      - WAIT_TO_CONNECT=1
-      - OAUTH_CALLBACK_URL=http://127.0.0.1:9876
-      - ENABLE_REMOTE=1
+      - DATABASE_ADDRESS=mongodb://kitcoin_mongodb_1 # Replace kitcoinnode with whatever your stack is called. It should be the name of the parent directory with any special characters removed.
+      - DATABASE_USER=kitcoin # Unused
+      - DATABASE_PORT=33060 # Unused
+      - DATABASE_PASSWORD=please-change-this # Unused
+      - WAIT_TO_CONNECT=1 # Unused
+      - OAUTH_CALLBACK_URL=http://127.0.0.1:9876/oauth
+      - ENABLE_REMOTE=1 # Should be 0 in production unless needed
 volumes:
   kitcoindbvolume:

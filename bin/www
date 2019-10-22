@@ -4,7 +4,8 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var app = require('../app').app;
+var session = require('../app').wssessionmethod;
 var debug = require('debug')('kitcoin:server');
 var http = require('http');
 
@@ -12,7 +13,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '9876');
 app.set('port', port);
 
 /**
@@ -20,6 +21,16 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+// WebSockets are important
+const WebSocket = require('ws')
+const wss = new WebSocket.Server({ noServer:true })
+wss.on('connection',session)
+server.on('upgrade',(req,sock,head)=>{
+  wss.handleUpgrade(req,sock,head,(ws)=>{
+    wss.emit('connection',ws,req)
+  })
+})
 
 /**
  * Listen on provided port, on all network interfaces.
