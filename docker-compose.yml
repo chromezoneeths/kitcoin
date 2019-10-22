@@ -1,0 +1,25 @@
+version: '2'
+services:
+  mongodb:
+    image: "mongo"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME='root'
+      - ME_CONFIG_MONGODB_ADMINPASSWORD='%%&change-this-please'
+    volumes:
+      - "kitcoindbvolume:/data/db"
+  kitcoin-main:
+    build: .
+    ports:
+      - "9876:9876"
+    links:
+      - "mongodb"
+    environment:
+      - DATABASE_ADDRESS=mongodb://kitcoinnode_mongodb_1
+      - DATABASE_USER=kitcoin
+      - DATABASE_PORT=33060
+      - DATABASE_PASSWORD=please-change-this
+      - WAIT_TO_CONNECT=1
+      - OAUTH_CALLBACK_URL=http://127.0.0.1:9876
+      - ENABLE_REMOTE=1
+volumes:
+  kitcoindbvolume:

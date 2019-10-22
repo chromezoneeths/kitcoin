@@ -10,7 +10,12 @@
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
+    "express-ws": "^4.0.0",
+    "googleapis": "^44.0.0",
     "http-errors": "~1.6.3",
-    "morgan": "~1.9.1"
+    "mongodb": "^3.3.3",
+    "morgan": "~1.9.1",
+    "uuid": "^3.3.3",
+    "ws": "^7.2.0"
   }
 }
