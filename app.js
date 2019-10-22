@@ -91,6 +91,9 @@ async function session(ws, req) {
   console.log(`RECORDS, LOGGING: User ${user.data.names[0].displayName} has connected with email ${user.data.emailAddresses[0].value}.`);
   var userQuery = await db.getUserByAddress(user.data.emailAddresses[0].value)
   var userID, address, name, admin
+  var ping = setInterval(()=>{
+    ws.send(JSON.stringify({action:'ping'}))
+  },500)
   if (userQuery != undefined) {
     userID = userQuery.uuid
     address = userQuery.address
@@ -165,7 +168,7 @@ async function session(ws, req) {
       case "mintCoin": {
         if (message.amount !== parseInt(message.amount, 10)) {
           ws.send(JSON.stringify({
-            action: "sendResponse",
+            action: "mintResponse",
             status: "badInput"
           }))
         } else if (admin) {
@@ -186,7 +189,7 @@ async function session(ws, req) {
       case "voidCoin": {
         if (message.amount !== parseInt(message.amount, 10)) {
           ws.send(JSON.stringify({
-            action: "sendResponse",
+            action: "voidResponse",
             status: "badInput"
           }))
         } else if (admin) {
@@ -248,7 +251,7 @@ async function session(ws, req) {
         if (!admin || !conf.enableRemote) {
           console.log(`RECORDS, WARNING: UNAUTHORIZED USER ${name} ATTEMPTS ELEVATED ACTION ${message.procedure} WITH BODY ${message.body}`);
           ws.send(JSON.stringify({
-            action: "elevateResponse",
+            action: "elevateResult",
             status: "denied"
           }))
           return;
@@ -256,7 +259,7 @@ async function session(ws, req) {
           console.log(`RECORDS, LOGGING: USER ${name} EXECUTES ELEVATED ACTION ${message.procedure} WITH BODY ${message.body}`);
           ad.handle(message, ws).catch((re) => {
             ws.send(JSON.stringify({
-              action: "elevateResponse",
+              action: "elevateResult",
               status: "error",
               contents: re
             }))
@@ -264,8 +267,9 @@ async function session(ws, req) {
         }
         break;
       }
+      case "pong":{break}
       default:
-        console.error(`RECORDS, WARNING: User ${name} attempts invalid action.`);
+        console.error(`RECORDS, WARNING: User ${name} attempts invalid action ${message.action}.`);
     }
   })
   ws.on('close', async () => {
