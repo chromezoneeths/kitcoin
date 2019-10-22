@@ -1,0 +1,5 @@
+{
+  "clientId": "Your client ID goes here",
+  "clientSecret": "Your client secret goes here"
+  Remove this line and use this file to create oauth_info.json
+}
