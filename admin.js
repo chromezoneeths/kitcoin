@@ -1,4 +1,5 @@
 const db = require('./db');
+const config = require('./config')
 // This file contains definitions for the rpc actions.
 exports.handle = (message, ws) => {
   return new Promise(async (r, rj) => {
@@ -59,6 +60,28 @@ exports.handle = (message, ws) => {
           contents: 'This is the MongoDB port of Kitcoin, you can\'t do that here.'
         }))
         break;
+      }
+      case "probe": { // Checks whether a user exists. Returns it if it does, otherwise returns undefined.
+        var userQuery = await db.getUserByAddress(message.body)
+        ws.send(JSON.stringify({
+          action: 'elevateResult',
+          status: 'ok',
+          contents: userQuery
+        }))
+      }
+      case "revert": { // Revert a transaction by ID in the body
+        await db.revoke(message.body)
+        ws.send(JSON.stringify({
+          action:'elevateResult',
+          status:'ok'
+        }))
+      }
+      case "help": { // Return a help message.
+        ws.send(JSON.stringify({
+          action:'elevateResult',
+          status:'ok',
+          contents:config.helpMessage
+        }))
       }
       default: {
         ws.send(JSON.stringify({

@@ -179,3 +179,12 @@ exports.exec = (statement) => {
     rj("RECORDS, WARNING: Arbitrary SQL call run on non-SQL Kitcoin variant.")
   })
 }
+exports.revoke = (id) => {
+  return new Promise(async r=>{
+    await client.connect()
+    const db = client.db('kitcoin')
+    const transactions = db.collection('transactions')
+    await transactions.deleteOne({uuid:id})
+    r()
+  })
+}
