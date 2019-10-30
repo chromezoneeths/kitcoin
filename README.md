@@ -7,6 +7,6 @@ This is the final repository for ETHS Kitcoin. **Please do not push to the maste
 
 Responsibilities
 
-Frontend - Keith (leader), Nichol (lead dev), Andrew (dev)
+Frontend - Keith (leader), Nichol (lead dev), Andrew (dev), Holli
 
-Backend - Oliver (leader, dev), Albert (Google Classroom API lead, dev), Mateo (express lead, dev)
+Backend - Oliver (leader, dev), Albert (Google Classroom API lead, dev), Mateo (express lead, dev), Tucker
