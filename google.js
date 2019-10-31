@@ -33,9 +33,10 @@ exports.getStudents = (auth, id) => {
       students.forEach(student => {
         result.push({
           name: student.profile.name.fullName,
-          address: student.profile.emailAddress
+          email: student.profile.emailAddress
         })
       });
+      r(result)
     })
   })
 }
