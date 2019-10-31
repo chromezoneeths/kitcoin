@@ -1,11 +1,13 @@
+const googleapis = require('googleapis').google
 // This file contains abstractions for Google APIs.
 exports.getCourses = (auth) => {
-  return new Promise(async (r) => {
+  return new Promise(async (r, rj) => {
     var classroomAPI = googleapis.classroom({
       version: 'v1',
       auth: auth.auth
     })
     classroomAPI.courses.list({ pageSize: 0 }, (err, res) => {
+      if (err) rj(err);
       var courses = res.data.courses;
       var result = []
       courses.forEach(course => {
@@ -19,12 +21,13 @@ exports.getCourses = (auth) => {
   })
 }
 exports.getStudents = (auth, id) => {
-  return new Promise(async (r) => {
+  return new Promise(async (r, rj) => {
     var classroomAPI = googleapis.classroom({
       version: 'v1',
       auth: auth.auth
     })
     classroomAPI.courses.students.list({ courseId: id, pageSize: 0 }, (err, res) => {
+      if (err) rj(err);
       var students = res.data.students
       var result = []
       students.forEach(student => {
