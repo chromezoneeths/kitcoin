@@ -33,6 +33,7 @@ exports.getStudents = (auth, id) => {
           address: student.profile.emailAddress
         })
       });
+      r(result)
     })
   })
 }
