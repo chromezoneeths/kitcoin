@@ -5,16 +5,31 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var exphbs = require('express-handlebars');
+var fs = require('fs');
 
+var config = require('./config');
 var indexRouter = require('./routes/index');
 var dashboardRouter = require('./routes/dashboard');
 var loginRouter = require('./routes/login');
 
 var app = express();
 
-app.listen(5000, () => {
-  console.log('KitCoin is listening on port 5000.');
-});
+// Checks if code should use a local https certificate, configured by env variables. See https://docs.google.com/document/d/1-oF_bcskiEk2IDY2Tt8Ct5rXgFG-2JJK2e64DSvHq1A/edit?usp=sharing.
+if (process.env.LOCAL_HTTPS) {
+  var https = require('https');
+  var key = fs.readFileSync(process.env.KEY_PATH);
+  var cert = fs.readFileSync(process.env.CERT_PATH);
+  https.createServer({
+    key: key,
+    cert: cert
+  }, app).listen(config.nodePort, () => {
+    console.log('KitCoin is listening on port ' + config.nodePort + '.');
+  });
+} else {
+  app.listen(config.nodePort, () => {
+    console.log('KitCoin is listening on port ' + config.nodePort + '.');
+  });
+}
 
 
 // view engine setup
