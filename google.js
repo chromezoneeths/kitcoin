@@ -1,42 +1,38 @@
-const googleapis = require('googleapis').google
+/*jshint -W104, -W119 */
 // This file contains abstractions for Google APIs.
-exports.getCourses = (auth) => {
+const conf = require('./config');
+const uuid = require('uuid/v4');
+const url = require('url');
+const k = require('./keys'); // This won't be in the repository; make your own keys in the Google Developer Console.
+const sharedScopes = [
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile'
+];
+const staffScopes = [
+  'https://www.googleapis.com/auth/classroom.courses.readonly',
+  'https://www.googleapis.com/auth/classroom.rosters.readonly',
+  'https://www.googleapis.com/auth/classroom.profile.emails'
+];
+const { google } = require('googleapis');
+
+exports.url = ((isStaff) => {
   return new Promise(async (r, rj) => {
-    var classroomAPI = googleapis.classroom({
-      version: 'v1',
-      auth: auth.auth
-    })
-    classroomAPI.courses.list({ pageSize: 0 }, (err, res) => {
-      if (err) rj(err);
-      var courses = res.data.courses;
-      var result = []
-      courses.forEach(course => {
-        result.push({
-          name: course.name,
-          id: course.id
-        })
-      })
-      r(result)
-    })
-  })
-}
-exports.getStudents = (auth, id) => {
+    var client = new google.auth.OAuth2(
+      k.clientId,
+      k.clientSecret,
+      `${conf.baseUrl}/ocb`
+    );
+    var scopes = sharedScopes;
+    if (isStaff) scopes.concat(staffScopes);
+    const url = client.generateAuthUrl({
+      access_type: 'online',
+      scope: scopes
+    });
+    r(url);
+  });
+});
+exports.callback = (() => {
   return new Promise(async (r, rj) => {
-    var classroomAPI = googleapis.classroom({
-      version: 'v1',
-      auth: auth.auth
-    })
-    classroomAPI.courses.students.list({ courseId: id, pageSize: 0 }, (err, res) => {
-      if (err) rj(err);
-      var students = res.data.students
-      var result = []
-      students.forEach(student => {
-        result.push({
-          name: student.profile.name.fullName,
-          email: student.profile.emailAddress
-        })
-      });
-      r(result)
-    })
-  })
-}
+
+  });
+});

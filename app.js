@@ -1,4 +1,4 @@
-/* jshint -W119*/
+/* jshint -W104, -W119*/
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -17,20 +17,23 @@ var app = express();
 
 // Checks if code should use a local https certificate, configured by env variables. See https://docs.google.com/document/d/1-oF_bcskiEk2IDY2Tt8Ct5rXgFG-2JJK2e64DSvHq1A/edit?usp=sharing.
 if (process.env.LOCAL_HTTPS) {
-  var https = require('https');
+  var http = require('https');
   var key = fs.readFileSync(process.env.KEY_PATH);
   var cert = fs.readFileSync(process.env.CERT_PATH);
-  https.createServer({
+  http.createServer({
     key: key,
     cert: cert
   }, app).listen(config.nodePort, () => {
     console.log('KitCoin is listening on port ' + config.nodePort + '.');
   });
 } else {
+  var http = require('http').createServer(app);
   app.listen(config.nodePort, () => {
     console.log('KitCoin is listening on port ' + config.nodePort + '.');
   });
 }
+
+var io = require('socket.io')(http);
 
 
 // view engine setup
