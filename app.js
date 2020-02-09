@@ -8,6 +8,7 @@ var exphbs = require('express-handlebars');
 var fs = require('fs');
 
 var config = require('./config');
+var keys = require('./keys');
 var indexRouter = require('./routes/index');
 var dashboardRouter = require('./routes/dashboard');
 var loginRouter = require('./routes/login');
@@ -58,6 +59,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+  if (err)
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
