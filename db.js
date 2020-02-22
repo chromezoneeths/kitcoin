@@ -6,14 +6,14 @@ const uuid = require('uuid/v4');
 const { getRandomBytes } = require('crypto');
 let client;
 exports.init = () => {
-  return new Promise(async (r, rj) => {
+	return new Promise(async (r, rj) => {
 		console.log('RECORDS, LOGGING: Connecting to database at ' + conf.dbIP);
 		client = new MongoClient(conf.dbIP, { useNewUrlParser: true });
-    try {
-      await client.connect();
+		try {
+			await client.connect();
 			console.log('RECORDS, LOGGING: Connection successful, ensuring everything is ready');
-      const db = client.db('kitcoin');
-      await Promise.all([
+			const db = client.db('kitcoin');
+			await Promise.all([
 				db.createCollection('users', {
 					validator: {
 						$or: [
@@ -23,7 +23,7 @@ exports.init = () => {
 							{ role: { $in: ['student', 'teacher', 'vendor', 'admin', 'sadmin'] } }
 						]
 					}
-        }),
+				}),
 				db.createCollection('transactions', {
 					validator: {
 						$or: [
@@ -34,7 +34,7 @@ exports.init = () => {
 							{ amount: { $type: 'int' } }
 						]
 					}
-        }),
+				}),
 				db.createCollection('products', {
 					validator: {
 						$or: [
@@ -44,8 +44,18 @@ exports.init = () => {
 							{ description: { $type: 'string' } },
 							{ price: { $type: 'int' } }
 						]
-    }
-  })
+					}
+				}),
+				db.createCollection('sessions', {
+					validator: {
+						$or: [
+							{ uuid: { $type: 'string' } },
+							{ user: { $type: 'string' } },
+							{ secret: { $type: 'string' } },
+							{ token: { $type: 'string' } }
+						]
+					}
+				})
 			]);
 			console.log('RECORDS, LOGGING: All collections have been created.');
 		} catch (error) {
@@ -53,15 +63,15 @@ exports.init = () => {
 			console.log(error);
 			console.log(error.stack);
 			process.exit(1); // Can't connect to database to set things up; there's no need to stay alive
-}
+		}
 	});
 };
 
 exports.addUser = (id, address, name) => {
 	return new Promise(async r => {
 		await client.connect();
-    const db = client.db('kitcoin');
-    await db.collection('users').insertOne({
+		const db = client.db('kitcoin');
+		await db.collection('users').insertOne({
 			uuid: id,
 			address,
 			name,
@@ -75,7 +85,7 @@ exports.addTransaction = (sender, recipient, amount) => {
 	return new Promise(async r => {
 		await client.connect();
 		const db = client.db('kitcoin');
-    await db.collection('transactions').insertOne({
+		await db.collection('transactions').insertOne({
 			uuid: uuid(),
 			timestamp: (new Date(Date.now())).toISOString(),
 			sender,
@@ -94,23 +104,23 @@ exports.getBalance = uuid => {
 		const transactions = db.collection('transactions');
 		const rec = await transactions.find({ recipient: uuid });
 		const out = await transactions.find({ sender: uuid });
-    await Promise.all([
+		await Promise.all([
 			new Promise(async r => {
 				while (await rec.hasNext()) {
 					const doc = await rec.next();
 					balance += doc.amount;
-        }
+				}
 
 				r();
-      }),
+			}),
 			new Promise(async r => {
 				while (await out.hasNext()) {
 					const doc = await out.next();
 					balance -= doc.amount;
-        }
+				}
 
 				r();
-      })
+			})
 		]);
 		r(balance);
 	});
@@ -124,9 +134,9 @@ exports.getUserByAddress = address => {
 		const search = await users.find({ address });
 		if (await search.hasNext()) {
 			r(await search.next());
-    } else {
+		} else {
 			r();
-    }
+		}
 	});
 };
 
@@ -138,9 +148,9 @@ exports.getUserByID = uuid => {
 		const search = await users.find({ uuid });
 		if (await search.hasNext()) {
 			r(await search.next());
-    } else {
+		} else {
 			r();
-}
+		}
 	});
 };
 
@@ -153,7 +163,7 @@ exports.listUsers = () => {
 		const search = await users.find({});
 		while (await search.hasNext()) {
 			results.push(await search.next());
-}
+		}
 
 		r(results);
 	});
@@ -168,17 +178,17 @@ exports.listTransactions = () => {
 		const search = await transactions.find({});
 		while (await search.hasNext()) {
 			results.push(await search.next());
-}
+		}
 
 		r(results);
 	});
 };
 
 exports.grant = (id, permission) => {
-  return new Promise(async (r, rj) => {
+	return new Promise(async (r, rj) => {
 		if (!['admin', 'teacher', 'vendor'].includes(permission)) {
 			rj('Invalid permission');
-}
+		}
 
 		await client.connect();
 		const db = client.db('kitcoin');
@@ -189,7 +199,7 @@ exports.grant = (id, permission) => {
 };
 
 exports.degrant = (id, permission) => {
-  return new Promise(async (r, rj) => {
+	return new Promise(async (r, rj) => {
 		await client.connect();
 		const db = client.db('kitcoin');
 		const users = db.collection('users');
@@ -199,7 +209,7 @@ exports.degrant = (id, permission) => {
 };
 
 exports.exec = statement => {
-  return new Promise(async (r, rj) => {
+	return new Promise(async (r, rj) => {
 		rj('RECORDS, WARNING: Arbitrary SQL call run on non-SQL Kitcoin variant.');
 	});
 };
@@ -214,4 +224,32 @@ exports.revoke = id => {
 	});
 };
 
-}
+exports.getSession = secret => {
+	return new Promise(async (resolve, reject) => {
+		await client.connect();
+		const db = client.db('kitcoin');
+		const sessions = db.collection('sessions');
+		const search = sessions.find({ secret });
+		if (search.hasNext()) {
+			resolve((await search.next()).token);
+		} else {
+			resolve(false);
+		}
+	});
+};
+
+exports.addSession = (token, user) => {
+	return new Promise((resolve, reject) => {
+		await client.connect();
+		const db = client.db('kitcoin');
+		const sessions = db.collection('sessions');
+		const secret = getRandomBytes(64);
+		await sessions.insertOne({
+			uuid: uuid(),
+			secret,
+			user,
+			token
+		});
+		resolve(secret);
+	});
+};
