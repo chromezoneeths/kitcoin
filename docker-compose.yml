@@ -8,7 +8,7 @@ services:
     volumes:
       - "kitcoindbvolume:/data/db"
   kitcoin-main:
-    build: .
+    build: . # Replace this with a container tag in production
     ports:
       - "9876:9876"
     links:
@@ -20,6 +20,6 @@ services:
       - DATABASE_PASSWORD=please-change-this # Unused
       - WAIT_TO_CONNECT=1 # Unused
       - OAUTH_CALLBACK_URL=http://127.0.0.1:9876/oauth
-      - ENABLE_REMOTE=1 # Should be 0 in production unless needed
+      - ENABLE_REMOTE=1 # Should be 0 in production when not needed, enables admin interface.
 volumes:
   kitcoindbvolume:
