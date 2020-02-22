@@ -1,8 +1,8 @@
 // This file contains abstractions for Google APIs.
-const conf = require('./config') // gotta have them inconsistent semicolons amirite
+const conf = require('./config'); // Gotta have them inconsistent semicolons amirite
 const uuid = require('uuid/v4');
 const urllib = require('url');
-const oauthKeys = require('./oauth_info') // This won't be in the repository; make your own keys in the Google Developer Console.
+const oauthKeys = require('./oauth_info'); // This won't be in the repository; make your own keys in the Google Developer Console.
 const oauthScopes = [
   'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/userinfo.profile',
@@ -35,10 +35,10 @@ exports.prepare = (socket) => { // Blocks until user consents, otherwise doesn't
 }
 exports.callback = async (req, res, url) => {
   console.log(`OAUTH ROUTER GET ${url}`);
-  if(url.startsWith("/oauthstage1")){
-        res.writeHead(200)
-        res.end(`<script src="stage1.js"></script>`)
-        // const qs = new url.URL(req.url, conf.oauthCallbackUrl)
+	if (url.startsWith('/oauthstage1')) {
+		res.writeHead(200);
+		res.end('<script src="stage1.js"></script>');
+		// Const qs = new url.URL(req.url, conf.oauthCallbackUrl)
         //       .searchParams;
         // for(var i in pendingOAuthCallbacks){
         //   if(pendingOAuthCallbacks[i].id == qs.get(`uuid`)){
@@ -50,36 +50,51 @@ exports.callback = async (req, res, url) => {
         //     pendingOAuthCallbacks[i].reslve({auth:pendingOAuthCallbacks[i].client})
         //   }
         // }
-      }
-      else if(url.startsWith("/oauthstage2")){
-        res.writeHead(200)
-        res.end(`<script src="stage2.js"></script>`)
-      }
-      else if(url.startsWith("/oauthstage3")){
+	} else if (url.startsWith('/oauthstage2')) {
+		res.writeHead(200);
+		res.end('<script src="stage2.js"></script>');
+	} else if (url.startsWith('/oauthstage3')) {
         const qs = new urllib.URL(url, conf.oauthCallbackUrl)
               .searchParams;
-        for(var i in pendingOAuthCallbacks){
-          if(pendingOAuthCallbacks[i].id == qs.get(`uuid`)){
-            const {tokens} = await pendingOAuthCallbacks[i].client.getToken(qs.get('code'));
-            res.writeHead(200)
-            res.end("<script>setTimeout(()=>{window.close()},300)</script>")
-            pendingOAuthCallbacks[i].client.credentials = tokens
-            pendingOAuthCallbacks[i].reslve({auth:pendingOAuthCallbacks[i].client})
-          }
-        }
-      }
+		for (const i in pendingOAuthCallbacks) {
+			if (pendingOAuthCallbacks[i].id == qs.get('uuid')) {
+				const {
+					tokens
+				} = await pendingOAuthCallbacks[i].client.getToken(qs.get('code'));
+				res.writeHead(200);
+				res.end('<script>setTimeout(()=>{window.close()},300)</script>');
+				pendingOAuthCallbacks[i].client.credentials = tokens;
+				pendingOAuthCallbacks[i].reslve({
+					auth: pendingOAuthCallbacks[i].client
+				});
 }
-exports.getCourses = (classroom) => {
-  return new Promise(async (r)=>{
-    classroom.courses.list({pageSize:0}, (err, res)=>{
-      r({err, res})
-    })
-  })
 }
-exports.getStudents = (classroom, id)=>{
-  return new Promise(async (r)=>{
-    classroom.courses.students.list({courseId:id,pageSize:0}, (err,res)=>{
-      r({err,res})
-    })
-  })
 }
+};
+
+exports.getCourses = classroom => {
+	return new Promise(async r => {
+		classroom.courses.list({
+			pageSize: 0
+		}, (err, res) => {
+			r({
+				err,
+				res
+			});
+		});
+	});
+};
+
+exports.getStudents = (classroom, id) => {
+	return new Promise(async r => {
+		classroom.courses.students.list({
+			courseId: id,
+			pageSize: 0
+		}, (err, res) => {
+			r({
+				err,
+				res
+			});
+		});
+	});
+};
