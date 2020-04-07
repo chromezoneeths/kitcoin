@@ -7,6 +7,7 @@ const logger = require('morgan');
 import oauthRouter from './routes/oauth';
 import usersRouter from './routes/users';
 import indexRouter from './routes/index';
+import cron from 'cron';
 
 const app = express();
 
@@ -58,6 +59,13 @@ init();
 
 async function session(ws: WebSocket): Promise<void> {
 	console.log('Got new connection');
+
+	ws.on('close', async () => {
+		console.log(`RECORDS, LOGGING: User ${name} has disconnected.`);
+		if (ping) clearInterval(ping);
+	});
+
+	
 	const auth = await google.prepare(ws);
 	const peopleAPI = googleapis.people({
 		version: 'v1',
@@ -274,11 +282,21 @@ async function session(ws: WebSocket): Promise<void> {
 		}
 	}
 	);
-	ws.on('close', async () => {
-		console.log(`RECORDS, LOGGING: User ${name} has disconnected.`);
-		clearInterval(ping);
-	});
+	
 }
 
 module.exports.app = app;
 module.exports.wssessionmethod = session;
+
+// Explicitly handle SIGINT since docker treats node as init and won't kill it otherwise
+process.on('SIGINT', function() {
+	// It doesn't output anything, but it will die after a few seconds like it should.
+ process.exit();
+});
+
+// Automatically restart at midnight to prevent any memory leakage over time
+{
+	const job = new cron.CronJob("0 0 * * *", ()=>{
+		process.kill(process.pid, "SIGINT")
+	})
+}
