@@ -2,7 +2,13 @@
 
 ## How to deploy
 
-    docker-compose up --build -d
+1. Edit docker-compose.yml to your satisfaction. Pay close attention to the username, password, and OAuth fields. Ensure that OAUTH_CALLBACK_URL/oauthstage1 is a trusted OAuth redirect URL.
+2. If you'd like to use an external database, you should comment out the mongodb section of docker-compose.yml and edit the DATABASE_ADDRESS field accordingly.
+3. Run `docker-compose up --build -d` to build and run the software. See further documentation on docker-compose [here](https://docs.docker.com/compose/).
+4. It's recommended that you use a reverse proxy for Kitcoin, since we don't natively implement HTTPS, and Express's static file serving is a bit slow.
+  * If you're in a development environment, you can put your files in a directory named 'public' in Kitcoin's working directory and it'll serve them from there.
+  * If you're in production, you can configure your webserver to pass HTTP(S) requests under OAUTH_CALLBACK_URL and websocket requests on any path you like to Kitcoin, and serve static files for anything else.
+5. You can enter Mongo Shell to add administrators by running `docker-compose exec mongodb mongo`.
 
 ## How it works
 
