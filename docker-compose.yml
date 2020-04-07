@@ -21,7 +21,7 @@ services:
       - DATABASE_USER=root # Unused
       - DATABASE_PORT=33060 # Unused
       - DATABASE_PASSWORD=%%&change-this-please # Unused
-      - WAIT_TO_CONNECT=1 # Number of seconds to wait before connecting to db
+      - WAIT_TO_CONNECT=0 # Number of seconds to wait before connecting to db
       - OAUTH_CALLBACK_URL=http://127.0.0.1:9876/oauth
       - OAUTH_CLIENT_ID="Your client ID goes here"
       - OAUTH_CLIENT_SECRET="Your client secret goes here"
