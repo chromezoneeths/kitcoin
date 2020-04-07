@@ -8,6 +8,7 @@ services:
     volumes:
       - "kitcoin_db_volume:/data/db"
   kitcoin-main:
+    restart: always
     build: . # Replace this with a container tag in production
     ports:
       - "9876:9876"
