@@ -59,26 +59,26 @@ export async function init(): Promise<void> {
 	console.log('RECORDS, LOGGING: All collections have been created.');
 }
 
-interface Session {
+export interface Session {
 	uuid: string;
 	secret: string;
 	user: string;
 	token: string;
 }
-interface Transaction {
+export interface Transaction {
 	uuid: string;
 	timestamp: Date;
 	sender: string;
 	recipient: string;
 	amount: number;
 }
-interface User {
+export interface User {
 	uuid: string;
 	address: string;
 	name: string;
 	role: Permission;
 }
-interface Product {
+export interface Product {
 	uuid: string;
 	vendor: string;
 	name: string;
@@ -137,9 +137,9 @@ export async function getUserByAddress(address: string): Promise<User> {
 	await client.connect();
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
-	const search = users.find({address});
-	if (await search.hasNext()) {
-		return search.next();
+	const search = await users.findOne({address});
+	if (search) {
+		return search;
 	}
 
 	throw new Error('User not found.');
@@ -149,9 +149,9 @@ export async function getUserByID(uuid: string): Promise<User> {
 	await client.connect();
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
-	const search = users.find({uuid});
-	if (await search.hasNext()) {
-		return search.next();
+	const search = await users.findOne({uuid});
+	if (search) {
+		return search;
 	}
 
 	throw new Error('User not found.');
@@ -218,9 +218,9 @@ export async function getSession(secret: string): Promise<Session> {
 	await client.connect();
 	const db = client.db(conf.dbName);
 	const sessions = db.collection('sessions');
-	const search = sessions.find({secret});
-	if (await search.hasNext()) {
-		return search.next();
+	const search = await sessions.findOne({secret});
+	if (search) {
+		return search;
 	}
 
 	throw new Error('Session not found');
