@@ -1,9 +1,12 @@
 // This file contains abstractions for Google APIs.
-const conf = require('./config'); // Gotta have them inconsistent semicolons amirite
-const uuid = require('uuid/v4');
-const urllib = require('url');
-const db = require('./db');
-const oauthKeys = require('./oauth_info'); // This won't be in the repository; make your own keys in the Google Developer Console.
+import * as conf from './config';
+import {v4 as uuid} from 'uuid';
+import * as urllib from 'url';
+import * as db from './db';
+const oauthKeys = {
+	clientId: process.env.OAUTH_CLIENT_ID,
+	clientSecret: process.env.OAUTH_CLIENT_SECRET
+};
 const oauthScopes = [
 	'https://www.googleapis.com/auth/userinfo.email',
 	'https://www.googleapis.com/auth/userinfo.profile',
@@ -11,22 +14,28 @@ const oauthScopes = [
 	'https://www.googleapis.com/auth/classroom.rosters.readonly',
 	'https://www.googleapis.com/auth/classroom.profile.emails'
 ];
-const {
-	google
-} = require('googleapis');
+import {google} from 'googleapis';
+import {Response, Request} from 'express';
+import WebSocket from 'ws';
 const pendingOAuthCallbacks = [];
-exports.prepare = socket => { // Blocks until user consents, otherwise doesn't do anything
-	return new Promise(resolve => {
+
+interface OAuthInfo {
+	refresh: any;
+	auth: any;
+}
+
+export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
+	return new Promise(resolve => { // Can't use fancy ES6 stuff here since I need to pass the resolve function around
 		const oAuthClient = new google.auth.OAuth2(
 			oauthKeys.clientId,
 			oauthKeys.clientSecret,
 			`${conf.oauthCallbackUrl}/oauthstage2`
 		);
-		async function h (raw) {
+		async function h(raw: string): Promise<void> {
 			const message = JSON.parse(raw);
 			switch (message.action) {
-				case "google": { // User doesn't have a secret and wants to sign in with Google
-					const thisOAuthID = uuid();
+				case 'google': { // User doesn't have a secret and wants to sign in with Google
+					const thisOAuthID: string = uuid();
 					const thisPendingOAuth = {
 						id: thisOAuthID,
 						reslve: resolve,
@@ -47,9 +56,12 @@ exports.prepare = socket => { // Blocks until user consents, otherwise doesn't d
 					}));
 					break;
 				}
-				case "secret": { // If the user wants to use their secret to use an existing session
-					const refresh = await db.getSession(message.secret);
-					if (!refresh) { // If there is no token found in database for secret
+
+				case 'secret': { // If the user wants to use their secret to use an existing session
+					const refresh = (await db.getSession(message.secret).catch(() => {
+						return {token: ''};
+					}));
+					if (refresh.token === '') { // If there is no token found in database for secret, tell the user to discard it.
 						socket.send(JSON.stringify({
 							action: 'secret',
 							result: false
@@ -57,13 +69,13 @@ exports.prepare = socket => { // Blocks until user consents, otherwise doesn't d
 						socket.once('message', h);
 					} else { // If the session is present, load it and tell the user to continue.
 						oAuthClient.setCredentials({
-							refresh_token: refresh
+							refresh_token: refresh.token
 						});
 						socket.send(JSON.stringify({
 							action: 'secret',
 							result: true
 						}));
-						oauth2Client.once('tokens', (tokens) => {
+						oAuthClient.once('tokens', tokens => {
 							if (tokens.refresh_token) {
 								resolve({
 									refresh: tokens.refresh_token,
@@ -72,21 +84,24 @@ exports.prepare = socket => { // Blocks until user consents, otherwise doesn't d
 							}
 						});
 					}
+
 					break;
 				}
+
 				default:
-					console.error("user fricked up");
+					console.error('user fricked up');
 			}
 		}
+
 		socket.once('message', h);
 	});
-};
+}
 
-exports.callback = async (req, res, url) => {
+export async function callback(request: Request, response: Response, url: string): Promise<void> {
 	console.log(`OAUTH ROUTER GET ${url}`);
 	if (url.startsWith('/oauthstage1')) {
-		res.writeHead(200);
-		res.end('<script src="stage1.js"></script>');
+		response.writeHead(200);
+		response.end('<script src="stage1.js"></script>');
 		// Const qs = new url.URL(req.url, conf.oauthCallbackUrl)
 		//       .searchParams;
 		// for(var i in pendingOAuthCallbacks){
@@ -100,18 +115,18 @@ exports.callback = async (req, res, url) => {
 		//   }
 		// }
 	} else if (url.startsWith('/oauthstage2')) {
-		res.writeHead(200);
-		res.end('<script src="stage2.js"></script>');
+		response.writeHead(200);
+		response.end('<script src="stage2.js"></script>');
 	} else if (url.startsWith('/oauthstage3')) {
 		const qs = new urllib.URL(url, conf.oauthCallbackUrl)
 			.searchParams;
-		for (const i in pendingOAuthCallbacks) {
-			if (pendingOAuthCallbacks[i].id == qs.get('uuid')) {
+		for (const i of pendingOAuthCallbacks) {
+			if (pendingOAuthCallbacks[i].id === qs.get('uuid')) {
 				const {
 					tokens
 				} = await pendingOAuthCallbacks[i].client.getToken(qs.get('code'));
-				res.writeHead(200);
-				res.end('<script>setTimeout(()=>{window.close()},300)</script>');
+				response.writeHead(200);
+				response.end('<script>setTimeout(()=>{window.close()},300)</script>');
 				pendingOAuthCallbacks[i].client.credentials = tokens;
 				pendingOAuthCallbacks[i].reslve({
 					auth: pendingOAuthCallbacks[i].client
@@ -119,31 +134,32 @@ exports.callback = async (req, res, url) => {
 			}
 		}
 	}
-};
+}
 
-exports.getCourses = classroom => {
-	return new Promise(async r => {
-		classroom.courses.list({
-			pageSize: 0
-		}, (err, res) => {
-			r({
-				err,
-				res
-			});
-		});
+export async function getCourses(classroom): Promise<any> {
+	classroom.courses.list({
+		pageSize: 0
+	}, (err, response) => {
+		return {
+			err,
+			res: response
+		};
 	});
-};
+}
 
-exports.getStudents = (classroom, id) => {
-	return new Promise(async r => {
-		classroom.courses.students.list({
-			courseId: id,
-			pageSize: 0
-		}, (err, res) => {
-			r({
-				err,
-				res
-			});
+export async function getStudents(classroom, id): Promise<serverResponse> {
+	return new Promise(resolve => classroom.courses.students.list({
+		courseId: id,
+		pageSize: 0
+	}, (err, response) => {
+		resolve({
+			err,
+			res: response
 		});
-	});
-};
+	}));
+}
+
+interface serverResponse {
+	err;
+	res;
+}

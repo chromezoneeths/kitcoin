@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 services:
   mongodb:
     image: "mongo"
@@ -6,20 +6,25 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME='root'
       - ME_CONFIG_MONGODB_ADMINPASSWORD='%%&change-this-please'
     volumes:
-      - "kitcoindbvolume:/data/db"
+      - "kitcoin_db_volume:/data/db"
   kitcoin-main:
     build: . # Replace this with a container tag in production
     ports:
       - "9876:9876"
     links:
       - "mongodb"
+    depends_on:
+      - mongodb
     environment:
-      - DATABASE_ADDRESS=mongodb://kitcoin_mongodb_1 # Replace kitcoinnode with whatever your stack is called. It should be the name of the parent directory with any special characters removed.
-      - DATABASE_USER=kitcoin # Unused
+      - DATABASE_ADDRESS=mongodb://mongodb
+      - DATABASE_NAME=kitcoin
+      - DATABASE_USER=root # Unused
       - DATABASE_PORT=33060 # Unused
-      - DATABASE_PASSWORD=please-change-this # Unused
-      - WAIT_TO_CONNECT=1 # Unused
+      - DATABASE_PASSWORD=%%&change-this-please # Unused
+      - WAIT_TO_CONNECT=1 # Number of seconds to wait before connecting to db
       - OAUTH_CALLBACK_URL=http://127.0.0.1:9876/oauth
-      - ENABLE_REMOTE=1 # Should be 0 in production when not needed, enables admin interface.
+      - OAUTH_CLIENT_ID="Your client ID goes here"
+      - OAUTH_CLIENT_SECRET="Your client secret goes here"
+      - ENABLE_REMOTE=1 # Should be 0 in production unless needed, enables admin endpoints.
 volumes:
-  kitcoindbvolume:
+  kitcoin_db_volume:

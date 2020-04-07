@@ -1,11 +1,12 @@
-const createError = require('http-errors');
+import createError from 'http-errors';
 const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
+import * as path from 'path';
+import cookieParser from 'cookie-parser';
+import {v4 as uuid} from 'uuid';
 const logger = require('morgan');
-
-const indexRouter = require('./routes');
-const usersRouter = require('./routes/users');
+import oauthRouter from './routes/oauth';
+import usersRouter from './routes/users';
+import indexRouter from './routes/index';
 
 const app = express();
 
@@ -15,50 +16,47 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-const google = require('./google.js');
-const fs = require('fs');
+import * as google from './google';
 app.use('/oauth', oauthRouter);
 
 // Catch 404 and forward to error handler
-app.use((req, res, next) => {
+app.use((request, response, next) => {
 	next(createError(404));
 });
 
 // Error handler
-app.use((err, req, res, next) => {
+app.use((err, request, response, _next) => {
 	// Set locals, only providing error in development
-	res.locals.message = err.message;
-	res.locals.error = req.app.get('env') === 'development' ? err : {};
+	response.locals.message = err.message;
+	response.locals.error = request.app.get('env') === 'development' ? err : {};
 
 	// Render the error page
-	res.status(err.status || 500);
-	res.render('error');
+	response.status(err.status	|| 500);
+	response.render('error');
 });
 
 // Bits added to the end for the backend, probably awful and wrong.
 
 const googleapis = require('googleapis').google;
-const WebSocket = require('ws');
-const http = require('http');
-const uuid = require('uuid/v4');
-const conf = require('./config');
-const db = require('./db');
-const ad = require('./admin');
-async function init () {
-	await db.init().catch(error => {
-		console.log(`RECORDS, ERROR: Failed to connect to database. ${error}`); process.exit(1);
+import * as conf from './config';
+import * as db from './db';
+import * as ad from './admin';
+import WebSocket from 'ws';
+async function init(): Promise<void> {
+	await db.init().catch((error: Error) => {
+		throw error;
 	});
 }
 
 init();
 
-async function session (ws, req) {
+async function session(ws: WebSocket): Promise<void> {
 	console.log('Got new connection');
 	const auth = await google.prepare(ws);
 	const peopleAPI = googleapis.people({
@@ -75,15 +73,18 @@ async function session (ws, req) {
 	});
 	console.log(`RECORDS, LOGGING: User ${user.data.names[0].displayName} has connected with email ${user.data.emailAddresses[0].value}.`);
 	const userQuery = await db.getUserByAddress(user.data.emailAddresses[0].value);
-	let userID; let address; let name; let admin;
+	let userID: string;
+	let address: string;
+	let name: string;
+	let admin: boolean;
 	const ping = setInterval(() => {
-		ws.send(JSON.stringify({ action: 'ping' }));
+		ws.send(JSON.stringify({action: 'ping'}));
 	}, 500);
-	if (userQuery != undefined) {
+	if (userQuery) {
 		userID = userQuery.uuid;
 		address = userQuery.address;
 		name = userQuery.name;
-		admin = userQuery.role == 'admin';
+		admin = userQuery.role === db.Permission.admin;
 	} else {
 		userID = uuid();
 		admin = false;
@@ -100,7 +101,7 @@ async function session (ws, req) {
 		email: address,
 		balance: db.getBalance(userID)
 	}));
-	ws.on('message', async stringMessage => {
+	ws.on('message', async (stringMessage: string) => {
 		const message = JSON.parse(stringMessage);
 		switch (message.action) {
 			case 'getBalance': {
@@ -117,29 +118,27 @@ async function session (ws, req) {
 				let isBalanceSufficient;
 				let target;
 				await Promise.all([
-					new Promise(async (r, rj) => {
-						const balance = await db.getBalance(userID).catch(rj);
+					async () => {
+						const balance = await db.getBalance(userID);
 						isBalanceSufficient = balance > message.amount;
-						r();
-					}),
-					new Promise(async (r, rj) => {
-						target = await db.getUserByAddress(targetAddress).catch(rj);
-						r();
-					})
+					},
+					async () => {
+						target = await db.getUserByAddress(targetAddress);
+					}
 				]);
 				console.log(isBalanceSufficient);
-				if (message.amount !== parseInt(message.amount, 10) || !/[A-Za-z0-9]*\@[A-Za-z0-9]*\.[a-z]{3}/.test(message.target)) {
+				if (message.amount !== parseInt(message.amount, 10) || !/[A-Za-z\d]*@[A-Za-z\d]*\.[a-z]{3}/.test(message.target)) {
 					ws.send(JSON.stringify({
 						action: 'sendResponse',
 						status: 'badInput'
 					}));
-				} else if (isBalanceSufficient && target != undefined) {
+				} else if (isBalanceSufficient && target !== undefined) {
 					await db.addTransaction(userID, target[0], message.amount);
 					ws.send(JSON.stringify({
 						action: 'sendResponse',
 						status: 'ok'
 					}));
-				} else if (target == undefined) {
+				} else if (target === undefined) {
 					ws.send(JSON.stringify({
 						action: 'sendResponse',
 						status: 'nonexistentTarget'
@@ -201,7 +200,7 @@ async function session (ws, req) {
 			}
 
 			case 'getClasses': {
-				var result = await google.getCourses(classroomAPI);
+				const result = await google.getCourses(classroomAPI);
 				if (result.err) {
 					ws.send(JSON.stringify({
 						action: 'getClassesResponse',
@@ -209,8 +208,8 @@ async function session (ws, req) {
 						err: result.err
 					}));
 				} else {
-					const { courses } = result.res.data;
-					if (courses && courses.length) {
+					const {courses} = result.res.data;
+					if (courses?.length) {
 						ws.send(JSON.stringify({
 							action: 'getClassesResponse',
 							status: 'ok',
@@ -223,7 +222,7 @@ async function session (ws, req) {
 			}
 
 			case 'getStudents': {
-				var result = await google.getStudents(classroomAPI, message.classID);
+				const result = await google.getStudents(classroomAPI, message.classID);
 				if (result.err) {
 					ws.send(JSON.stringify({
 						action: 'getStudentsResponse',
@@ -232,7 +231,7 @@ async function session (ws, req) {
 					}));
 				} else {
 					console.log(result.res.data);
-					const { students } = result.res.data;
+					const {students} = result.res.data;
 					ws.send(JSON.stringify({
 						action: 'getStudentsResponse',
 						status: 'ok',
@@ -243,7 +242,7 @@ async function session (ws, req) {
 				break;
 			}
 
-			case 'oauthInfo': { }
+			case 'oauthInfo': { break; }
 			case 'elevate': {
 				if (!admin || !conf.enableRemote) {
 					console.log(`RECORDS, WARNING: UNAUTHORIZED USER ${name} ATTEMPTS ELEVATED ACTION ${message.procedure} WITH BODY ${message.body}`);
@@ -269,7 +268,8 @@ async function session (ws, req) {
 			default:
 				console.error(`RECORDS, WARNING: User ${name} attempts invalid action ${message.action}.`);
 		}
-	});
+	}
+	);
 	ws.on('close', async () => {
 		console.log(`RECORDS, LOGGING: User ${name} has disconnected.`);
 	});
