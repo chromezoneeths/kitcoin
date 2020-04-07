@@ -1,3 +1,4 @@
 oauth_info.json
 node_modules/*
 public/*
+dist/*
