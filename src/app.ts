@@ -125,7 +125,9 @@ async function session(ws: WebSocket): Promise<void> {
 						isBalanceSufficient = balance > message.amount;
 					},
 					async () => {
-						target = await db.getUserByAddress(targetAddress);
+						target = await db.getUserByAddress(targetAddress).catch(() => {
+							return undefined;
+						});
 					}
 				]);
 				console.log(isBalanceSufficient);
