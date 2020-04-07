@@ -41,13 +41,13 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 						reslve: resolve,
 						client: oAuthClient
 					};
-					const url = `${conf.oauthCallbackUrl}/oauthstage1#${JSON.stringify({
+					const url = `${conf.oauthCallbackUrl}/oauthstage1#${encodeURI(JSON.stringify({
 						redirect: oAuthClient.generateAuthUrl({
 							scope: oauthScopes,
 							access_type: 'online'
 						}),
 						uuid: thisOAuthID
-					})}`;
+					}))}`;
 					pendingOAuthCallbacks.push(thisPendingOAuth);
 					console.log(`Sending login message ${thisOAuthID}`);
 					socket.send(JSON.stringify({
@@ -121,15 +121,15 @@ export async function callback(request: Request, response: Response, url: string
 		const qs = new urllib.URL(url, conf.oauthCallbackUrl)
 			.searchParams;
 		for (const i of pendingOAuthCallbacks) {
-			if (pendingOAuthCallbacks[i].id === qs.get('uuid')) {
+			if (i.id === qs.get('uuid')) {
 				const {
 					tokens
-				} = await pendingOAuthCallbacks[i].client.getToken(qs.get('code'));
+				} = await i.client.getToken(qs.get('code'));
 				response.writeHead(200);
 				response.end('<script>setTimeout(()=>{window.close()},300)</script>');
-				pendingOAuthCallbacks[i].client.credentials = tokens;
-				pendingOAuthCallbacks[i].reslve({
-					auth: pendingOAuthCallbacks[i].client
+				i.client.credentials = tokens;
+				i.reslve({
+					auth: i.client
 				});
 			}
 		}

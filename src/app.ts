@@ -72,7 +72,9 @@ async function session(ws: WebSocket): Promise<void> {
 		personFields: 'emailAddresses,names'
 	});
 	console.log(`RECORDS, LOGGING: User ${user.data.names[0].displayName} has connected with email ${user.data.emailAddresses[0].value}.`);
-	const userQuery = await db.getUserByAddress(user.data.emailAddresses[0].value);
+	const userQuery = await db.getUserByAddress(user.data.emailAddresses[0].value).catch(() => {
+		return undefined;
+	});
 	let userID: string;
 	let address: string;
 	let name: string;
@@ -272,6 +274,7 @@ async function session(ws: WebSocket): Promise<void> {
 	);
 	ws.on('close', async () => {
 		console.log(`RECORDS, LOGGING: User ${name} has disconnected.`);
+		clearInterval(ping);
 	});
 }
 
