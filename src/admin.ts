@@ -90,6 +90,44 @@ export async function handle(message, ws): Promise<void> {
 			break;
 		}
 
+		case 'listSessions': {
+			let sessions = await db.listSessions();
+			let limit: number;
+			try {
+				limit = parseInt(message.body, 10);
+			} catch (_) {
+				limit = 50;
+			}
+
+			sessions = sessions.slice(-limit);
+			ws.send(JSON.stringify({
+				action: 'elevateResult',
+				status: 'ok',
+				contents: sessions
+			}));
+			break;
+		}
+
+		case 'getSession': {
+			const session = await db.getSessionById(message.body);
+			ws.send(JSON.stringify({
+				action: 'elevateResult',
+				status: 'ok',
+				contents: session
+			}));
+			break;
+		}
+
+		case 'bogusSession': {
+			const session = await db.addSession(message.body);
+			ws.send(JSON.stringify({
+				action: 'elevateResult',
+				status: 'ok',
+				contents: session
+			}));
+			break;
+		}
+
 		default: {
 			ws.send(JSON.stringify({
 				action: 'elevateResult',
