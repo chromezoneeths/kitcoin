@@ -27,6 +27,14 @@ commands.
 - probe
     This command returns a user by email address.
 - revert
-    This command reverts a transaction by uuid, where the body is the uuid.
+				This command reverts a transaction by uuid, where the body is the uuid.
+- listSessions
+				List all valid user sessions.
+- killSession
+				Invalidate an active session.
+- getSession
+				Get a session by id.
+- bogusSession
+				Get a bogus session for a user by id. This can be used to log in as the user.
 - help
     Returns this help message.`;
