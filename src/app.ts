@@ -304,7 +304,7 @@ module.exports.app = app;
 module.exports.wssessionmethod = session;
 
 // Explicitly handle SIGINT since docker treats node as init and won't kill it otherwise
-process.on('SIGINT', function() {
+process.on('SIGINT', () => {
 	// It doesn't output anything, but it will die after a few seconds like it should.
  process.exit();
 });
