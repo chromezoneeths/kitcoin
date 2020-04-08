@@ -215,23 +215,19 @@ async function session(ws: WebSocket): Promise<void> {
 				if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
 				const result = await google.getCourses(classroomAPI);
 					const {courses} = result.res.data;
-					if (courses?.length) {
-				if (result.err) {
+					if (result.err || courses.length === 0) {
 					ws.send(JSON.stringify({
 						action: 'getClassesResponse',
 						status: 'ServerError',
 						err: result.err
 					}));
 				} else {
-					const {courses} = result.res.data;
-					if (courses?.length) {
 						ws.send(JSON.stringify({
 							action: 'getClassesResponse',
 							status: 'ok',
 							classes: courses
 						}));
 					}
-				}
 				} else {
 					ws.send(JSON.stringify({
 						action: 'getClassesResponse',
