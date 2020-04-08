@@ -62,10 +62,11 @@ async function session(ws: WebSocket): Promise<void> {
 
 	ws.on('close', async () => {
 		console.log(`RECORDS, LOGGING: User ${name} has disconnected.`);
-		if (ping) clearInterval(ping);
+		if (ping) {
+			clearInterval(ping);
+		}
 	});
 
-	
 	const auth = await google.prepare(ws);
 	const peopleAPI = googleapis.people({
 		version: 'v1',
