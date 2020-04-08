@@ -87,7 +87,7 @@ async function session(ws: WebSocket): Promise<void> {
 	let userID: string;
 	let address: string;
 	let name: string;
-	let admin: boolean;
+	let role: db.Permission;
 	const ping = setInterval(() => {
 		ws.send(JSON.stringify({action: 'ping'}));
 	}, 500);
@@ -95,10 +95,10 @@ async function session(ws: WebSocket): Promise<void> {
 		userID = userQuery.uuid;
 		address = userQuery.address;
 		name = userQuery.name;
-		admin = userQuery.role === db.Permission.admin;
+		role = userQuery.role;
 	} else {
 		userID = uuid();
-		admin = false;
+		role = db.Permission.student;
 		await db.addUser(userID, user.data.emailAddresses[0].value, user.data.names[0].displayName).catch(error => {
 			console.log(`RECORDS, ERROR: ${error}`);
 		});
@@ -139,7 +139,6 @@ async function session(ws: WebSocket): Promise<void> {
 						});
 					}
 				]);
-				console.log(isBalanceSufficient);
 				if (message.amount !== parseInt(message.amount, 10) || !/[A-Za-z\d]*@[A-Za-z\d]*\.[a-z]{3}/.test(message.target)) {
 					ws.send(JSON.stringify({
 						action: 'sendResponse',
@@ -172,7 +171,7 @@ async function session(ws: WebSocket): Promise<void> {
 						action: 'mintResponse',
 						status: 'badInput'
 					}));
-				} else if (admin) {
+				} else if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
 					await db.addTransaction('nobody', userID, message.amount);
 					ws.send(JSON.stringify({
 						action: 'mintResponse',
@@ -195,7 +194,7 @@ async function session(ws: WebSocket): Promise<void> {
 						action: 'voidResponse',
 						status: 'badInput'
 					}));
-				} else if (admin) {
+				} else if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
 					await db.addTransaction(userID, 'nobody', message.amount);
 					ws.send(JSON.stringify({
 						action: 'voidResponse',
@@ -213,7 +212,10 @@ async function session(ws: WebSocket): Promise<void> {
 			}
 
 			case 'getClasses': {
+				if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
 				const result = await google.getCourses(classroomAPI);
+					const {courses} = result.res.data;
+					if (courses?.length) {
 				if (result.err) {
 					ws.send(JSON.stringify({
 						action: 'getClassesResponse',
@@ -230,11 +232,18 @@ async function session(ws: WebSocket): Promise<void> {
 						}));
 					}
 				}
+				} else {
+					ws.send(JSON.stringify({
+						action: 'getClassesResponse',
+						status: 'denied'
+					}));
+				}
 
 				break;
 			}
 
 			case 'getStudents': {
+				if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
 				const result = await google.getStudents(classroomAPI, message.classID);
 				if (result.err) {
 					ws.send(JSON.stringify({
@@ -251,13 +260,19 @@ async function session(ws: WebSocket): Promise<void> {
 						students
 					}));
 				}
+				} else {
+					ws.send(JSON.stringify({
+						action: 'getStudentsResponse',
+						status: 'denied'
+					}));
+				}
 
 				break;
 			}
 
 			case 'oauthInfo': { break; }
 			case 'elevate': {
-				if (!admin || !conf.enableRemote) {
+				if (role !== db.Permission.admin || !conf.enableRemote) {
 					console.log(`RECORDS, WARNING: UNAUTHORIZED USER ${name} ATTEMPTS ELEVATED ACTION ${message.procedure} WITH BODY ${message.body}`);
 					ws.send(JSON.stringify({
 						action: 'elevateResult',
@@ -283,7 +298,6 @@ async function session(ws: WebSocket): Promise<void> {
 		}
 	}
 	);
-	
 }
 
 module.exports.app = app;

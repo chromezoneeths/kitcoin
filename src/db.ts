@@ -19,7 +19,7 @@ export async function init(): Promise<void> {
 					{uuid: {$type: 'string'}},
 					{address: {$regex: /[A-Za-z\d]*@[A-Za-z\d]*\.[a-z]*/}},
 					{name: {$type: 'string'}},
-					{role: {$in: ['student', 'teacher', 'vendor', 'admin', 'sadmin']}}
+					{role: {$type: 'int'}}
 				]
 			}
 		}),
@@ -93,7 +93,7 @@ export async function addUser(id, address, name): Promise<void> {
 		uuid: id,
 		address,
 		name,
-		role: 'student'
+		role: Permission.student
 	});
 }
 
@@ -184,23 +184,24 @@ export async function listTransactions(): Promise<Transaction[]> {
 }
 
 export enum Permission {
+	student=0,
 	admin,
 	teacher,
 	vendor,
 }
 
-export async function grant(id: string, _permission: Permission): Promise<void> {
+export async function grant(id: string, permission: Permission): Promise<void> {
 	await client.connect();
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
-	await users.findOneAndUpdate({uuid: id}, {$set: {role: _permission}});
+	await users.findOneAndUpdate({uuid: id}, {$set: {role: permission}});
 }
 
 export async function degrant(id: string, _permission: string): Promise<void> {
 	await client.connect();
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
-	await users.findOneAndUpdate({uuid: id}, {$set: {role: 'student'}});
+	await users.findOneAndUpdate({uuid: id}, {$set: {role: 0}});
 }
 
 export async function exec(statement: string): Promise<void> {
