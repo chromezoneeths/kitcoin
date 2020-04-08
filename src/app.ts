@@ -311,7 +311,8 @@ process.on('SIGINT', () => {
 
 // Automatically restart at midnight to prevent any memory leakage over time
 {
-	const job = new cron.CronJob("0 0 * * *", ()=>{
-		process.kill(process.pid, "SIGINT")
-	})
+	const job = new cron.CronJob('0 0 * * *', () => {
+		process.kill(process.pid, 'SIGINT');
+	});
+	job.start();
 }
