@@ -116,15 +116,15 @@ export async function getBalance(uuid): Promise<number> {
 	const transactions = db.collection('transactions');
 	const rec = transactions.find({recipient: uuid});
 	const out = transactions.find({sender: uuid});
-			while (await rec.hasNext()) {
-				const doc = await rec.next();
-				balance += doc.amount;
-			}
+	while (await rec.hasNext()) {
+		const doc = await rec.next();
+		balance += doc.amount;
+	}
 
-			while (await out.hasNext()) {
-				const doc = await out.next();
-				balance -= doc.amount;
-			}
+	while (await out.hasNext()) {
+		const doc = await out.next();
+		balance -= doc.amount;
+	}
 
 	return balance;
 }

@@ -213,15 +213,15 @@ async function session(ws: WebSocket): Promise<void> {
 
 			case 'getClasses': {
 				if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
-				const result = await google.getCourses(classroomAPI);
+					const result = await google.getCourses(classroomAPI);
 					const {courses} = result.res.data;
 					if (result.err || courses.length === 0) {
-					ws.send(JSON.stringify({
-						action: 'getClassesResponse',
-						status: 'ServerError',
-						err: result.err
-					}));
-				} else {
+						ws.send(JSON.stringify({
+							action: 'getClassesResponse',
+							status: 'ServerError',
+							err: result.err
+						}));
+					} else {
 						ws.send(JSON.stringify({
 							action: 'getClassesResponse',
 							status: 'ok',
@@ -240,22 +240,22 @@ async function session(ws: WebSocket): Promise<void> {
 
 			case 'getStudents': {
 				if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
-				const result = await google.getStudents(classroomAPI, message.classID);
-				if (result.err) {
-					ws.send(JSON.stringify({
-						action: 'getStudentsResponse',
-						status: 'ServerError',
-						err: result.err
-					}));
-				} else {
-					console.log(result.res.data);
-					const {students} = result.res.data;
-					ws.send(JSON.stringify({
-						action: 'getStudentsResponse',
-						status: 'ok',
-						students
-					}));
-				}
+					const result = await google.getStudents(classroomAPI, message.classID);
+					if (result.err) {
+						ws.send(JSON.stringify({
+							action: 'getStudentsResponse',
+							status: 'ServerError',
+							err: result.err
+						}));
+					} else {
+						console.log(result.res.data);
+						const {students} = result.res.data;
+						ws.send(JSON.stringify({
+							action: 'getStudentsResponse',
+							status: 'ok',
+							students
+						}));
+					}
 				} else {
 					ws.send(JSON.stringify({
 						action: 'getStudentsResponse',
@@ -302,7 +302,7 @@ module.exports.wssessionmethod = session;
 // Explicitly handle SIGINT since docker treats node as init and won't kill it otherwise
 process.on('SIGINT', () => {
 	// It doesn't output anything, but it will die after a few seconds like it should.
- process.exit();
+	process.exit();
 });
 
 // Automatically restart at midnight to prevent any memory leakage over time
