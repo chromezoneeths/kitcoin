@@ -226,16 +226,41 @@ export async function getSession(secret: string): Promise<Session> {
 	throw new Error('Session not found');
 }
 
-export async function addSession(token: string, user: string): Promise<string> {
+export async function getSessionById(id: string): Promise<Session> {
+	await client.connect();
+	const db = client.db(conf.dbName);
+	const sessions = db.collection('sessions');
+	const search = await sessions.findOne({uuid: id});
+	if (search) {
+		return search;
+	}
+
+	throw new Error('Session not found');
+}
+
+export async function addSession(user: string): Promise<string> {
 	await client.connect();
 	const db = client.db(conf.dbName);
 	const sessions = db.collection('sessions');
 	const secret = crypto.randomBytes(1024).toString('base64'); // Brute force attacks can suck it
-	sessions.insertOne({ // Clients probably won't need to re-login within milliseconds, so we can let this run a bit late.
+	sessions.insertOne({
 		uuid: uuid(),
 		secret,
-		user,
-		token
+		user
 	});
 	return secret;
 }
+
+export async function listSessions(): Promise<Session[]> {
+	await client.connect();
+	const results = [];
+	const db = client.db(conf.dbName);
+	const sessions = db.collection('sessions');
+	const search = sessions.find({});
+	while (await search.hasNext()) {
+		results.push(await search.next());
+	}
+
+	return results;
+}
+
