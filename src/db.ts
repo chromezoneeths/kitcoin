@@ -87,7 +87,7 @@ export interface Product {
 }
 
 export async function addUser(id, address, name): Promise<void> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	await db.collection('users').insertOne({
 		uuid: id,
@@ -98,7 +98,7 @@ export async function addUser(id, address, name): Promise<void> {
 }
 
 export async function addTransaction(sender, recipient, amount): Promise<void> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	await db.collection('transactions').insertOne({
 		uuid: uuid(),
@@ -111,7 +111,7 @@ export async function addTransaction(sender, recipient, amount): Promise<void> {
 
 export async function getBalance(uuid): Promise<number> {
 	let balance = 0;
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const transactions = db.collection('transactions');
 	const rec = transactions.find({recipient: uuid});
@@ -130,7 +130,7 @@ export async function getBalance(uuid): Promise<number> {
 }
 
 export async function getUserByAddress(address: string): Promise<User> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
 	const search = await users.findOne({address});
@@ -142,7 +142,7 @@ export async function getUserByAddress(address: string): Promise<User> {
 }
 
 export async function getUserByID(uuid: string): Promise<User> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
 	const search = await users.findOne({uuid});
@@ -154,7 +154,7 @@ export async function getUserByID(uuid: string): Promise<User> {
 }
 
 export async function listUsers(): Promise<User[]> {
-	await client.connect();
+	// Await client.connect();
 	const results = [];
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
@@ -167,7 +167,7 @@ export async function listUsers(): Promise<User[]> {
 }
 
 export async function listTransactions(): Promise<Transaction[]> {
-	await client.connect();
+	// Await client.connect();
 	const results = [];
 	const db = client.db(conf.dbName);
 	const transactions = db.collection('transactions');
@@ -187,14 +187,14 @@ export enum Permission {
 }
 
 export async function grant(id: string, permission: Permission): Promise<void> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
 	await users.findOneAndUpdate({uuid: id}, {$set: {role: permission}});
 }
 
 export async function degrant(id: string, _permission: string): Promise<void> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const users = db.collection('users');
 	await users.findOneAndUpdate({uuid: id}, {$set: {role: 0}});
@@ -205,14 +205,14 @@ export async function exec(statement: string): Promise<void> {
 }
 
 export async function revoke(id: string): Promise<void> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const transactions = db.collection('transactions');
 	await transactions.deleteOne({uuid: id});
 }
 
 export async function getSession(secret: string): Promise<Session> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const sessions = db.collection('sessions');
 	const search = await sessions.findOne({secret});
@@ -224,7 +224,7 @@ export async function getSession(secret: string): Promise<Session> {
 }
 
 export async function getSessionById(id: string): Promise<Session> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const sessions = db.collection('sessions');
 	const search = await sessions.findOne({uuid: id});
@@ -236,7 +236,7 @@ export async function getSessionById(id: string): Promise<Session> {
 }
 
 export async function addSession(user: string): Promise<string> {
-	await client.connect();
+	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const sessions = db.collection('sessions');
 	const secret = crypto.randomBytes(1024).toString('base64'); // Brute force attacks can suck it
@@ -249,7 +249,7 @@ export async function addSession(user: string): Promise<string> {
 }
 
 export async function listSessions(): Promise<Session[]> {
-	await client.connect();
+	// Await client.connect();
 	const results = [];
 	const db = client.db(conf.dbName);
 	const sessions = db.collection('sessions');
