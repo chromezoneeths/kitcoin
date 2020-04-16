@@ -20,7 +20,7 @@ import WebSocket from 'ws';
 const pendingOAuthCallbacks = [];
 
 interface OAuthInfo {
-	refresh: any;
+	refresh: string;
 	auth: any;
 }
 
