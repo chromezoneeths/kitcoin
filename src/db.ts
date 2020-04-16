@@ -235,7 +235,7 @@ export async function getSessionById(id: string): Promise<Session> {
 	throw new Error('Session not found');
 }
 
-export async function addSession(user: string): Promise<string> {
+export async function addSession(user: string, token: string): Promise<string> {
 	// Await client.connect();
 	const db = client.db(conf.dbName);
 	const sessions = db.collection('sessions');
@@ -243,7 +243,8 @@ export async function addSession(user: string): Promise<string> {
 	sessions.insertOne({
 		uuid: uuid(),
 		secret,
-		user
+		user,
+		token
 	});
 	return secret;
 }

@@ -266,6 +266,15 @@ async function session(ws: WebSocket): Promise<void> {
 				break;
 			}
 
+			case 'secret': {
+				console.log(auth)
+				ws.send(JSON.stringify({
+					action: 'secret',
+					secret: await db.addSession(userID, auth.refresh)
+				}))
+				break;
+			}
+
 			case 'oauthInfo': { break; }
 			case 'elevate': {
 				if (role !== db.Permission.admin || !conf.enableRemote) {
