@@ -118,15 +118,15 @@ export async function handle(message, ws): Promise<void> {
 			break;
 		}
 
-		case 'bogusSession': {
-			const session = await db.addSession(message.body);
-			ws.send(JSON.stringify({
-				action: 'elevateResult',
-				status: 'ok',
-				contents: session
-			}));
-			break;
-		}
+		// case 'bogusSession': {
+		// 	const session = await db.addSession(message.body);
+		// 	ws.send(JSON.stringify({
+		// 		action: 'elevateResult',
+		// 		status: 'ok',
+		// 		contents: session
+		// 	}));
+		// 	break;
+		// }
 
 		default: {
 			ws.send(JSON.stringify({
