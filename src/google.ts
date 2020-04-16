@@ -44,7 +44,7 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 					const url = `${conf.oauthCallbackUrl}/oauthstage1#${encodeURI(JSON.stringify({
 						redirect: oAuthClient.generateAuthUrl({
 							scope: oauthScopes,
-							access_type: 'online'
+							access_type: 'offline'
 						}),
 						uuid: thisOAuthID
 					}))}`;
@@ -61,6 +61,7 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 					const refresh = (await db.getSession(message.secret).catch(() => {
 						return {token: ''};
 					}));
+					console.log(refresh)
 					if (refresh.token === '') { // If there is no token found in database for secret, tell the user to discard it.
 						socket.send(JSON.stringify({
 							action: 'secret',
@@ -75,14 +76,19 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 							action: 'secret',
 							result: true
 						}));
-						oAuthClient.once('tokens', tokens => {
-							if (tokens.refresh_token) {
-								resolve({
-									refresh: tokens.refresh_token,
-									auth: tokens.access_token
-								});
-							}
-						});
+						resolve({
+							auth: oAuthClient,
+							refresh: refresh.token
+						})
+
+						// oAuthClient.once('tokens', tokens => {
+						// 	if (tokens.refresh_token) {
+						// 		resolve({
+						// 			refresh: tokens.refresh_token,
+						// 			auth: tokens.access_token
+						// 		});
+						// 	}
+						// });
 					}
 
 					break;
@@ -122,14 +128,14 @@ export async function callback(request: Request, response: Response, url: string
 			.searchParams;
 		for (const i of pendingOAuthCallbacks) {
 			if (i.id === qs.get('uuid')) {
-				const {
-					tokens
-				} = await i.client.getToken(qs.get('code'));
+				const {tokens} = await i.client.getToken(qs.get('code'));
+				// console.log(tokens);
 				response.writeHead(200);
 				response.end('<script>setTimeout(()=>{window.close()},300)</script>');
-				i.client.credentials = tokens;
+				i.client.setCredentials(tokens);
 				i.reslve({
-					auth: i.client
+					auth: i.client,
+					refresh: tokens.refresh_token
 				});
 			}
 		}
