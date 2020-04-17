@@ -128,24 +128,16 @@ async function session(ws: WebSocket): Promise<void> {
 				const targetAddress = message.target;
 				let isBalanceSufficient;
 				let target;
-				await Promise.all([
-					async () => {
-						const balance = await db.getBalance(userID);
-						isBalanceSufficient = balance > message.amount;
-					},
-					async () => {
-						target = await db.getUserByAddress(targetAddress).catch(() => {
-							return undefined;
-						});
-					}
-				]);
+				const balance = await db.getBalance(userID);
+				isBalanceSufficient = balance > message.amount;
+				target = await db.getUserByAddress(targetAddress)
 				if (message.amount !== parseInt(message.amount, 10) || !/[A-Za-z\d]*@[A-Za-z\d]*\.[a-z]{3}/.test(message.target)) {
 					ws.send(JSON.stringify({
 						action: 'sendResponse',
 						status: 'badInput'
 					}));
-				} else if (isBalanceSufficient && target !== undefined) {
-					await db.addTransaction(userID, target[0], message.amount);
+				} else if (isBalanceSufficient && target) {
+					await db.addTransaction(userID, target.uuid, message.amount);
 					ws.send(JSON.stringify({
 						action: 'sendResponse',
 						status: 'ok'
