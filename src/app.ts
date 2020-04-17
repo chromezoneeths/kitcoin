@@ -270,6 +270,7 @@ async function session(ws: WebSocket): Promise<void> {
 			case 'oauthInfo': { break; }
 			case 'elevate': {
 				if (role !== db.Permission.admin || !conf.enableRemote) {
+					db.logEvent(userID, "attemptedElevate", 3)
 					console.log(`RECORDS, WARNING: UNAUTHORIZED USER ${name} ATTEMPTS ELEVATED ACTION ${message.procedure} WITH BODY ${message.body}`);
 					ws.send(JSON.stringify({
 						action: 'elevateResult',

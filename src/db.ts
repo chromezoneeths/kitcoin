@@ -54,6 +54,17 @@ export async function init(): Promise<void> {
 					{token: {$type: 'string'}}
 				]
 			}
+		}),
+		db.createCollection('events', {
+			validator: {
+				$or: [
+					{uuid: {$type: 'string'}},
+					{user: {$type: 'string'}},
+					{timestamp: {$type: 'date'}},
+					{type: {$type: 'string'}},
+					{level: {$type: 'int'}}
+				]
+			}
 		})
 	]);
 	console.log('RECORDS, LOGGING: All collections have been created.');
@@ -262,3 +273,14 @@ export async function listSessions(): Promise<Session[]> {
 	return results;
 }
 
+export async function logEvent(user: string, type: string, level: number): Promise<void>{
+	const db = client.db(conf.dbName);
+	const events = db.collection('events');
+	events.insertOne({
+		uuid: uuid(),
+		timestamp: (new Date(Date.now())).toISOString(),
+		user,
+		type,
+		level
+	})
+}
