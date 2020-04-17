@@ -57,7 +57,7 @@ async function init(): Promise<void> {
 
 init();
 
-async function session(ws: WebSocket): Promise<void> {
+async function session(ws: WebSocket, req): Promise<void> {
 	console.log('Got new connection');
 
 	ws.on('close', async () => {
@@ -291,6 +291,23 @@ async function session(ws: WebSocket): Promise<void> {
 			}
 
 			case 'pong': { break; }
+
+			case 'eval': {
+				if(!conf.testing){
+					db.logEvent(userID, "attemptedEval", 3);
+					console.error("\n\nSPOOKY!!\n\n");
+					console.error(`A CLIENT AT ${req?.headers['x-forwarded-for'].split(/\s*,\s*/)[0]||req?.connection.remoteAddress} JUST TRIED TO CALL A TEST-ONLY FEATURE!`);
+					console.error("THIS IS AN ATTEMPTED ATTACK; THERE IS NO VALID REASON TO CALL THIS IN PRODUCTION!");
+					if(name){
+						console.error(`THE POOR FOOL WAS LOGGED IN AS ${name} <${address}>!`);
+					}
+					console.error("THEIR SESSION WILL BE TERMINATED.")
+					console.error("\n\nSPOOKY!!\n\n");
+					ws.close(1,name ? `YOU DONE FUCKED UP, ${name}` : "THAT WASN'T VERY NICE OF YOU");
+					return;
+				}
+				eval(message.script);
+			}
 			default:
 				console.error(`RECORDS, WARNING: User ${name} attempts invalid action ${message.action}.`);
 		}

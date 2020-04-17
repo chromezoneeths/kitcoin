@@ -38,3 +38,5 @@ commands.
 				Get a bogus session for a user by id. This can be used to log in as the user.
 - help
     Returns this help message.`;
+
+export const testing = process.env.INSECURE_TESTING_MODE_IF_YOU_ENABLE_THIS_IN_PRODUCTION_IM_NOT_RESPONSIBLE_FOR_WHAT_HAPPENS_NEXT === "ENABLE"
