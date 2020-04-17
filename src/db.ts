@@ -148,8 +148,7 @@ export async function getUserByAddress(address: string): Promise<User> {
 	if (search) {
 		return search;
 	}
-
-	throw new Error('User not found.');
+ return undefined
 }
 
 export async function getUserByID(uuid: string): Promise<User> {
@@ -160,8 +159,7 @@ export async function getUserByID(uuid: string): Promise<User> {
 	if (search) {
 		return search;
 	}
-
-	throw new Error('User not found.');
+ return undefined
 }
 
 export async function listUsers(): Promise<User[]> {
@@ -231,7 +229,7 @@ export async function getSession(secret: string): Promise<Session> {
 		return search;
 	}
 
-	throw new Error('Session not found');
+	return undefined;
 }
 
 export async function getSessionById(id: string): Promise<Session> {
@@ -243,7 +241,7 @@ export async function getSessionById(id: string): Promise<Session> {
 		return search;
 	}
 
-	throw new Error('Session not found');
+	return undefined;
 }
 
 export async function addSession(user: string, token: string): Promise<string> {
