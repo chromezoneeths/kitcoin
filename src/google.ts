@@ -61,7 +61,6 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 					const refresh = (await db.getSession(message.secret).catch(() => {
 						return {token: ''};
 					}));
-					console.log(refresh)
 					if (refresh.token === '') { // If there is no token found in database for secret, tell the user to discard it.
 						socket.send(JSON.stringify({
 							action: 'secret',
