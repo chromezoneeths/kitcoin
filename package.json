@@ -28,8 +28,12 @@
 		"@types/morgan": "^1.9.0",
 		"@types/uuid": "^7.0.2",
 		"@types/ws": "^7.2.3",
+		"del": "^5.1.0",
+		"docker-compose": "^0.23.3",
 		"gulp": "^4.0.0",
+		"gulp-jest": "^4.0.3",
 		"gulp-typescript": "^6.0.0-alpha.1",
+		"jest-cli": "^25.3.0",
 		"typescript": "^3.8.3",
 		"xo": "^0.28.3"
 	},
