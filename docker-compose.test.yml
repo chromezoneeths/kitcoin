@@ -1,0 +1,33 @@
+version: "2"
+services:
+  mongodb:
+    image: "mongo"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME='root'
+      - ME_CONFIG_MONGODB_ADMINPASSWORD='pw'
+    volumes:
+      - "./test_data:/data/db"
+    ports:
+      - 127.0.0.1:33061:33060
+  kitcoin-main:
+    restart: always
+    build: . # Replace this with a container tag in production
+    ports:
+      - "127.0.0.1:19876:9876"
+    links:
+      - "mongodb"
+    depends_on:
+      - mongodb
+    environment:
+      - DATABASE_ADDRESS=mongodb://mongodb
+      - DATABASE_NAME=kitcoin
+      - DATABASE_USER=root # Unused
+      - DATABASE_PORT=33060 # Unused
+      - DATABASE_PASSWORD=pw # Unused
+      - WAIT_TO_CONNECT=0 # Number of seconds to wait before connecting to db
+      - OAUTH_CALLBACK_URL=http://127.0.0.1:9876/oauth
+      # Quotes break OAuth stuff, make sure you remove them.
+      - OAUTH_CLIENT_ID=OAuth client id goes here
+      - OAUTH_CLIENT_SECRET=OAuth client secret goes here
+      - ENABLE_REMOTE=1 # Should be 0 in production unless needed, enables admin endpoints.
+      - INSECURE_TESTING_MODE_IF_YOU_ENABLE_THIS_IN_PRODUCTION_IM_NOT_RESPONSIBLE_FOR_WHAT_HAPPENS_NEXT=enabled
