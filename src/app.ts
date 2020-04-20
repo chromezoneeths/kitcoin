@@ -78,7 +78,7 @@ async function session(ws: WebSocket, _request): Promise<void> {
 		personFields: 'emailAddresses,names'
 	});
 	console.log(`RECORDS, LOGGING: User ${user.data.names[0].displayName} has connected with email ${user.data.emailAddresses[0].value}.`);
-	const userQuery = await db.getUserByAddress(user.data.emailAddresses[0].value).catch(() => {
+	const userQuery = await db.user.getByAddress(user.data.emailAddresses[0].value).catch(() => {
 		return undefined;
 	});
 
@@ -95,7 +95,7 @@ async function session(ws: WebSocket, _request): Promise<void> {
 		role = userQuery.role;
 		role = userQuery.role;
 	} else {
-		await db.addUser(userID, user.data.emailAddresses[0].value, user.data.names[0].displayName).catch(error => {
+		await db.user.add(userID, user.data.emailAddresses[0].value, user.data.names[0].displayName).catch(error => {
 			console.log(`RECORDS, ERROR: ${error}`);
 		});
 	}
@@ -112,7 +112,7 @@ async function session(ws: WebSocket, _request): Promise<void> {
 		action: 'ready',
 		name: info.name,
 		email: info.address,
-		balance: db.getBalance(info.id)
+		balance: db.user.balance(info.id)
 	}));
 	ws.on('message', async (stringMessage: string) => {
 		const message = JSON.parse(stringMessage);

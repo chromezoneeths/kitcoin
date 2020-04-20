@@ -3,7 +3,7 @@ import * as config from './config';
 import {Info} from './user';
 
 export async function listUsers(): Promise<any> {
-	const usersQuery = await db.listUsers();
+	const usersQuery = await db.user.list();
 	return {
 		action: 'elevateResult',
 		status: 'ok',
@@ -12,7 +12,7 @@ export async function listUsers(): Promise<any> {
 }
 
 export async function listTransactions(_: Info, message: any): Promise<any> {
-	let transactions = await db.listTransactions();
+	let transactions = await db.transaction.list();
 	let limit: number; // This isn't implemented correctly but who cares right now
 	try {
 		limit = parseInt(message.body, 10);
@@ -31,7 +31,7 @@ export async function listTransactions(_: Info, message: any): Promise<any> {
 export async function grant(_: Info, message: any): Promise<any> {
 	const userAddress = message.body.split(' ')[0];
 	const permission = message.body.split(' ')[1];
-	await db.grant(userAddress, permission);
+	await db.user.grant(userAddress, permission);
 	return {
 		action: 'elevateResult',
 		status: 'ok'
@@ -39,7 +39,7 @@ export async function grant(_: Info, message: any): Promise<any> {
 }
 
 export async function probe(_: Info, message: any): Promise<any> {
-	const userQuery = await db.getUserByAddress(message.body);
+	const userQuery = await db.user.getByAddress(message.body);
 	return {
 		action: 'elevateResult',
 		status: 'ok',
@@ -48,7 +48,7 @@ export async function probe(_: Info, message: any): Promise<any> {
 }
 
 export async function revert(_: Info, message: any): Promise<any> {
-	await db.revoke(message.body);
+	await db.transaction.remove(message.body);
 	return {
 		action: 'elevateResult',
 		status: 'ok'
@@ -64,7 +64,7 @@ export async function help(_: Info): Promise<any> {
 }
 
 export async function listSessions(_: Info, message: any): Promise<any> {
-	let sessions = await db.listSessions();
+	let sessions = await db.session.list();
 	let limit: number;
 	try {
 		limit = parseInt(message.body, 10);
@@ -81,7 +81,7 @@ export async function listSessions(_: Info, message: any): Promise<any> {
 }
 
 export async function getSession(_: Info, message: any): Promise<any> {
-	const session = await db.getSessionById(message.body);
+	const session = await db.session.getById(message.body);
 	return {
 		action: 'elevateResult',
 		status: 'ok',

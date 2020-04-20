@@ -65,6 +65,17 @@ export async function init(): Promise<void> {
 					{level: {$type: 'int'}}
 				]
 			}
+		}),
+		db.createCollection('purchases', {
+			validator: {
+				$or: [
+					{uuid: {$type: 'string'}},
+					{vendor: {$type: 'string'}},
+					{customer: {$type: 'string'}},
+					{product: {$type: 'string'}},
+					{timestamp: {$type: 'date'}}
+				]
+			}
 		})
 	]);
 	console.log('RECORDS, LOGGING: All collections have been created.');
@@ -96,189 +107,197 @@ export interface Product {
 	description: string;
 	price: number;
 }
-
-export async function addUser(id, address, name): Promise<void> {
-	// Await client.connect();
-	const db = client.db(conf.dbName);
-	await db.collection('users').insertOne({
-		uuid: id,
-		address,
-		name,
-		role: Permission.student
-	});
-}
-
-export async function addTransaction(sender, recipient, amount): Promise<void> {
-	// Await client.connect();
-	const db = client.db(conf.dbName);
-	await db.collection('transactions').insertOne({
-		uuid: uuid(),
-		timestamp: (new Date(Date.now())).toISOString(),
-		sender,
-		recipient,
-		amount
-	});
-}
-
-export async function getBalance(uuid): Promise<number> {
-	let balance = 0;
-	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const transactions = db.collection('transactions');
-	const rec = transactions.find({recipient: uuid});
-	const out = transactions.find({sender: uuid});
-	while (await rec.hasNext()) {
-		const doc = await rec.next();
-		balance += doc.amount;
-	}
-
-	while (await out.hasNext()) {
-		const doc = await out.next();
-		balance -= doc.amount;
-	}
-
-	return balance;
-}
-
-export async function getUserByAddress(address: string): Promise<User> {
-	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const users = db.collection('users');
-	const search = await users.findOne({address});
-	if (search) {
-		return search;
-	}
- return undefined
-}
-
-export async function getUserByID(uuid: string): Promise<User> {
-	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const users = db.collection('users');
-	const search = await users.findOne({uuid});
-	if (search) {
-		return search;
-	}
- return undefined
-}
-
-export async function listUsers(): Promise<User[]> {
-	// Await client.connect();
-	const results = [];
-	const db = client.db(conf.dbName);
-	const users = db.collection('users');
-	const search = users.find({});
-	while (await search.hasNext()) {
-		results.push(await search.next());
-	}
-
-	return results;
-}
-
-export async function listTransactions(): Promise<Transaction[]> {
-	// Await client.connect();
-	const results = [];
-	const db = client.db(conf.dbName);
-	const transactions = db.collection('transactions');
-	const search = transactions.find({});
-	while (await search.hasNext()) {
-		results.push(await search.next());
-	}
-
-	return results;
-}
-
 export enum Permission {
 	student=0,
 	admin,
 	teacher,
 	vendor,
 }
-
-export async function grant(id: string, permission: Permission): Promise<void> {
+export const transaction = {
+	async add(sender: string, recipient: string, amount: string): Promise<void> {
 	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const users = db.collection('users');
-	await users.findOneAndUpdate({uuid: id}, {$set: {role: permission}});
-}
-
-export async function degrant(id: string, _permission: string): Promise<void> {
+		const db = client.db(conf.dbName);
+		await db.collection('transactions').insertOne({
+			uuid: uuid(),
+			timestamp: (new Date(Date.now())).toISOString(),
+			sender,
+			recipient,
+			amount
+		});
+	},
+	async remove(id: string): Promise<void> {
 	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const users = db.collection('users');
-	await users.findOneAndUpdate({uuid: id}, {$set: {role: 0}});
-}
-
-export async function exec(statement: string): Promise<void> {
-	throw new Error(`User attempted illegal SQL statement ${statement}`);
-}
-
-export async function revoke(id: string): Promise<void> {
+		const db = client.db(conf.dbName);
+		const transactions = db.collection('transactions');
+		await transactions.deleteOne({uuid: id});
+	},
+	async get(uuid: string): Promise<Transaction> {
 	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const transactions = db.collection('transactions');
-	await transactions.deleteOne({uuid: id});
-}
+		const db = client.db(conf.dbName);
+		const transactions = db.collection('transactions');
+		const search = await transactions.findOne({uuid});
+		if (search) {
+			return search;
+		}
 
-export async function getSession(secret: string): Promise<Session> {
+		return undefined;
+	},
+	async list(user?: string): Promise<Transaction[]> {
 	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const sessions = db.collection('sessions');
-	const search = await sessions.findOne({secret});
-	if (search) {
-		return search;
+		const results = [];
+		const db = client.db(conf.dbName);
+		const transactions = db.collection('transactions');
+		let search: mongo.Cursor<Transaction>;
+		if (user) {
+			search = transactions.find({$or: [{sender: user}, {recipient: user}]});
+		} else {
+			search = transactions.find({});
+		}
+
+		while (await search.hasNext()) {
+			results.push(await search.next());
+		}
+
+		return results;
 	}
-
-	return undefined;
-}
-
-export async function getSessionById(id: string): Promise<Session> {
+};
+export const user = {
+	async add(id: string, address: string, name: string): Promise<void> {
 	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const sessions = db.collection('sessions');
-	const search = await sessions.findOne({uuid: id});
-	if (search) {
-		return search;
+		const db = client.db(conf.dbName);
+		await db.collection('users').insertOne({
+			uuid: id,
+			address,
+			name,
+			role: Permission.student
+		});
+	},
+	async balance(uuid: string): Promise<number> {
+		let balance = 0;
+		// Await client.connect();
+		const db = client.db(conf.dbName);
+		const transactions = db.collection('transactions');
+		const rec = transactions.find({recipient: uuid});
+		const out = transactions.find({sender: uuid});
+		while (await rec.hasNext()) {
+			const doc = await rec.next();
+			balance += doc.amount;
+		}
+
+		while (await out.hasNext()) {
+			const doc = await out.next();
+			balance -= doc.amount;
+		}
+
+		return balance;
+	},
+	async list(): Promise<User[]> {
+	// Await client.connect();
+		const results = [];
+		const db = client.db(conf.dbName);
+		const users = db.collection('users');
+		const search = users.find({});
+		while (await search.hasNext()) {
+			results.push(await search.next());
+		}
+
+		return results;
+	},
+	async grant(id: string, permission: Permission): Promise<void> {
+	// Await client.connect();
+		const db = client.db(conf.dbName);
+		const users = db.collection('users');
+		await users.findOneAndUpdate({uuid: id}, {$set: {role: permission}});
+	},
+	async getByAddress(address: string): Promise<User> {
+	// Await client.connect();
+		const db = client.db(conf.dbName);
+		const users = db.collection('users');
+		const search = await users.findOne({address});
+		if (search) {
+			return search;
+		}
+
+		return undefined;
+	},
+	async getById(uuid: string): Promise<User> {
+	// Await client.connect();
+		const db = client.db(conf.dbName);
+		const users = db.collection('users');
+		const search = await users.findOne({uuid});
+		if (search) {
+			return search;
+		}
+
+		return undefined;
 	}
-
-	return undefined;
-}
-
-export async function addSession(user: string, token: string): Promise<string> {
-	// Await client.connect();
-	const db = client.db(conf.dbName);
-	const sessions = db.collection('sessions');
-	const secret = crypto.randomBytes(1024).toString('base64'); // Brute force attacks can suck it
-	sessions.insertOne({
-		uuid: uuid(),
-		secret,
-		user,
-		token
-	});
-	return secret;
-}
-
-export async function listSessions(): Promise<Session[]> {
-	// Await client.connect();
-	const results = [];
-	const db = client.db(conf.dbName);
-	const sessions = db.collection('sessions');
-	const search = sessions.find({});
-	while (await search.hasNext()) {
-		results.push(await search.next());
+};
+export const event = {
+	async add(user: string, type: string, level: number): Promise<void> {
+		const db = client.db(conf.dbName);
+		const events = db.collection('events');
+		events.insertOne({
+			uuid: uuid(),
+			timestamp: (new Date(Date.now())).toISOString(),
+			user,
+			type,
+			level
+		});
 	}
+};
+export const session = {
+	async add(user: string, token: string): Promise<string> {
+	// Await client.connect();
+		const db = client.db(conf.dbName);
+		const sessions = db.collection('sessions');
+		const secret = crypto.randomBytes(1024).toString('base64'); // Brute force attacks can suck it
+		sessions.insertOne({
+			uuid: uuid(),
+			secret,
+			user,
+			token
+		});
+		return secret;
+	},
+	async getById(id: string): Promise<Session> {
+	// Await client.connect();
+		const db = client.db(conf.dbName);
+		const sessions = db.collection('sessions');
+		const search = await sessions.findOne({uuid: id});
+		if (search) {
+			return search;
+		}
 
-	return results;
-}
+		return undefined;
+	},
+	async getBySecret(secret: string): Promise<Session> {
+	// Await client.connect();
+		const db = client.db(conf.dbName);
+		const sessions = db.collection('sessions');
+		const search = await sessions.findOne({secret});
+		if (search) {
+			return search;
+		}
 
-export async function logEvent(user: string, type: string, level: number): Promise<void>{
-	const db = client.db(conf.dbName);
-	const events = db.collection('events');
-	events.insertOne({
-		uuid: uuid(),
-		timestamp: (new Date(Date.now())).toISOString(),
-		user,
-		type,
-		level
-	})
-}
+		return undefined;
+	},
+	async list(user?: string): Promise<Session[]> {
+	// Await client.connect();
+		const results = [];
+		const db = client.db(conf.dbName);
+		const sessions = db.collection('sessions');
+		let search: mongo.Cursor<Session>;
+		if (user) {
+			search = sessions.find({user});
+		} else {
+			search = sessions.find({});
+		}
+
+		while (await search.hasNext()) {
+			results.push(await search.next());
+		}
+
+		return results;
+	}
+};
+

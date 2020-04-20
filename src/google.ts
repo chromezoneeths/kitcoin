@@ -58,7 +58,7 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 				}
 
 				case 'secret': { // If the user wants to use their secret to use an existing session
-					const refresh = (await db.getSession(message.secret).catch(() => {
+					const refresh = (await db.session.getBySecret(message.secret).catch(() => {
 						return {token: ''};
 					}));
 					if (refresh.token === '') { // If there is no token found in database for secret, tell the user to discard it.
@@ -78,9 +78,9 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 						resolve({
 							auth: oAuthClient,
 							refresh: refresh.token
-						})
+						});
 
-						// oAuthClient.once('tokens', tokens => {
+						// OAuthClient.once('tokens', tokens => {
 						// 	if (tokens.refresh_token) {
 						// 		resolve({
 						// 			refresh: tokens.refresh_token,
@@ -128,7 +128,7 @@ export async function callback(request: Request, response: Response, url: string
 		for (const i of pendingOAuthCallbacks) {
 			if (i.id === qs.get('uuid')) {
 				const {tokens} = await i.client.getToken(qs.get('code'));
-				// console.log(tokens);
+				// Console.log(tokens);
 				response.writeHead(200);
 				response.end('<script>setTimeout(()=>{window.close()},300)</script>');
 				i.client.setCredentials(tokens);

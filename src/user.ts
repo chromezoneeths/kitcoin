@@ -11,18 +11,20 @@ export interface Info {
 }
 
 export async function getBalance(info: Info): Promise<any> {
-	const balance = await db.getBalance(info.id);
+	const balance = await db.user.balance(info.id);
 	return {
 		action: 'balance',
 		balance
 	};
 }
 
+export const balance = getBalance;
+
 export async function sendCoin(info: Info, message: any): Promise<any> {
 	const targetAddress = message.target;
-	const balance = await db.getBalance(info.id);
+	const balance = await db.user.balance(info.id);
 	const isBalanceSufficient = balance > message.amount;
-	const target = await db.getUserByAddress(targetAddress);
+	const target = await db.user.getByAddress(targetAddress);
 	if (message.amount !== parseInt(message.amount, 10) || !/[A-Za-z\d]*@[A-Za-z\d]*\.[a-z]{3}/.test(message.target)) {
 		return {
 			action: 'sendResponse',
@@ -31,7 +33,7 @@ export async function sendCoin(info: Info, message: any): Promise<any> {
 	}
 
 	if (isBalanceSufficient && target) {
-		await db.addTransaction(info.id, target.uuid, message.amount);
+		await db.transaction.add(info.id, target.uuid, message.amount);
 		return {
 			action: 'sendResponse',
 			status: 'ok'
@@ -53,6 +55,35 @@ export async function sendCoin(info: Info, message: any): Promise<any> {
 	}
 }
 
+export const send = sendCoin;
+
+export async function takeCoin(info: Info, message: any): Promise<any> {
+	const target = message.target;
+	const amount = message.amount;
+	const targetUser = await db.user.getByAddress(target);
+	if (![db.Permission.teacher, db.Permission.vendor, db.Permission.admin].includes(info.role)) {
+		return {
+			action: 'take',
+			status: 'denied'
+		};
+	}
+
+	if (typeof targetUser === 'undefined') {
+		return {
+			action: 'take',
+			status: 'nonexistentTarget'
+		};
+	}
+
+	await db.transaction.add(info.id, targetUser.uuid, amount);
+	return {
+		action: 'take',
+		status: 'ok'
+	};
+}
+
+export const take = takeCoin;
+
 export async function mintCoin(info: Info, message: any): Promise<any> {
 	if (message.amount !== parseInt(message.amount, 10)) {
 		return {
@@ -62,7 +93,7 @@ export async function mintCoin(info: Info, message: any): Promise<any> {
 	}
 
 	if ([db.Permission.admin, db.Permission.teacher].includes(info.role)) {
-		await db.addTransaction('nobody', info.id, message.amount);
+		await db.transaction.add('nobody', info.id, message.amount);
 		return {
 			action: 'mintResponse',
 			status: 'ok'
@@ -75,6 +106,8 @@ export async function mintCoin(info: Info, message: any): Promise<any> {
 		status: 'denied'
 	};
 }
+
+export const mint = mintCoin;
 
 export async function getStudents(info: Info, message: any): Promise<any> {
 	if ([db.Permission.admin, db.Permission.teacher].includes(info.role)) {
@@ -115,7 +148,7 @@ export async function voidCoin(info: Info, message: any): Promise<any> {
 	}
 
 	if ([db.Permission.admin, db.Permission.teacher].includes(info.role)) {
-		await db.addTransaction(info.id, 'nobody', message.amount);
+		await db.transaction.add(info.id, 'nobody', message.amount);
 		return {
 			action: 'voidResponse',
 			status: 'ok'
@@ -161,7 +194,59 @@ export async function getClasses(info: Info): Promise<any> {
 export async function secret(info: Info): Promise<any> {
 	return {
 		action: 'secret',
-		secret: await db.addSession(info.id, info.auth.refresh)
+		secret: await db.session.add(info.id, info.auth.refresh)
+	};
+}
+
+export async function revokeTransaction(info: Info, message: any): Promise<any> {
+	const target = await db.transaction.get(message.target);
+	if (target.sender === info.id || target.recipient === info.id) { // This transaction belongs to this user
+		await db.transaction.remove(message.target);
+		return {
+			action: 'revoke',
+			status: true
+		};
+	}
+
+	if (info.role === db.Permission.admin) { // This user is an admin
+		await db.transaction.remove(message.target);
+		return {
+			action: 'revoke',
+			status: true
+		};
+	}
+
+	return {
+		action: 'revoke',
+		status: false
+	};
+}
+
+export async function listTransactions(info: Info, message: any): Promise<any> {
+	let result;
+	if (info.role === db.Permission.admin && message.all) {
+		result = await db.transaction.list();
+	} else {
+		result = await db.transaction.list(info.id);
+	}
+
+	return {
+		action: 'listTransactions',
+		result
+	};
+}
+
+export async function listSessions(info: Info, message: any): Promise<any> {
+	let result;
+	if (info.role === db.Permission.admin && message.all) {
+		result = await db.session.list();
+	} else {
+		result = await db.session.list(info.id);
+	}
+
+	return {
+		action: 'listSessions',
+		result
 	};
 }
 
