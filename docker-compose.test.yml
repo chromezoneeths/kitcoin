@@ -5,12 +5,9 @@ services:
     environment:
       - ME_CONFIG_MONGODB_ADMINUSERNAME='root'
       - ME_CONFIG_MONGODB_ADMINPASSWORD='pw'
-    volumes:
-      - "./test_data:/data/db"
     ports:
       - 127.0.0.1:33061:33060
   kitcoin-main:
-    restart: always
     build: . # Replace this with a container tag in production
     ports:
       - "127.0.0.1:19876:9876"
