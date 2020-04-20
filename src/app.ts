@@ -81,6 +81,7 @@ async function session(ws: WebSocket, _request): Promise<void> {
 	const userQuery = await db.getUserByAddress(user.data.emailAddresses[0].value).catch(() => {
 		return undefined;
 	});
+
 	let userID: string;
 	let address: string;
 	let name: string;
@@ -94,8 +95,6 @@ async function session(ws: WebSocket, _request): Promise<void> {
 		role = userQuery.role;
 		role = userQuery.role;
 	} else {
-		userID = uuid();
-		role = db.Permission.student;
 		await db.addUser(userID, user.data.emailAddresses[0].value, user.data.names[0].displayName).catch(error => {
 			console.log(`RECORDS, ERROR: ${error}`);
 		});
