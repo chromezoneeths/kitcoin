@@ -2,11 +2,13 @@ import createError from 'http-errors';
 const express = require('express');
 import * as path from 'path';
 import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import {v4 as uuid} from 'uuid';
 const logger = require('morgan');
 import oauthRouter from './routes/oauth';
 import usersRouter from './routes/users';
 import indexRouter from './routes/index';
+import ApiRouter from './api-router';
 import cron from 'cron';
 
 const app = express();
@@ -19,12 +21,14 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 import * as google from './google';
 app.use('/oauth', oauthRouter);
+app.use('/api', ApiRouter);
 
 // Catch 404 and forward to error handler
 app.use((request, response, next) => {

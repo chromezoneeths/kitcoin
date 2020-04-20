@@ -7,6 +7,7 @@
 		"build": "gulp"
 	},
 	"dependencies": {
+		"body-parser": "^1.19.0",
 		"cookie-parser": "~1.4.4",
 		"cron": "^1.8.2",
 		"debug": "~2.6.9",
