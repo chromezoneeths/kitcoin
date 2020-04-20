@@ -47,7 +47,8 @@ app.use((err, request, response, _next) => {
 const googleapis = require('googleapis').google;
 import * as conf from './config';
 import * as db from './db';
-import * as ad from './admin';
+import * as userActions from './user';
+import * as adminActions from './admin';
 import WebSocket from 'ws';
 async function init(): Promise<void> {
 	await db.init().catch((error: Error) => {
@@ -57,7 +58,7 @@ async function init(): Promise<void> {
 
 init();
 
-async function session(ws: WebSocket, req): Promise<void> {
+async function session(ws: WebSocket, _request): Promise<void> {
 	console.log('Got new connection');
 
 	ws.on('close', async () => {
@@ -69,10 +70,6 @@ async function session(ws: WebSocket, req): Promise<void> {
 
 	const auth = await google.prepare(ws);
 	const peopleAPI = googleapis.people({
-		version: 'v1',
-		auth: auth.auth
-	});
-	const classroomAPI = googleapis.classroom({
 		version: 'v1',
 		auth: auth.auth
 	});
@@ -94,7 +91,7 @@ async function session(ws: WebSocket, req): Promise<void> {
 	if (userQuery) {
 		userID = userQuery.uuid;
 		address = userQuery.address;
-		name = userQuery.name;
+		role = userQuery.role;
 		role = userQuery.role;
 	} else {
 		userID = uuid();
@@ -102,214 +99,35 @@ async function session(ws: WebSocket, req): Promise<void> {
 		await db.addUser(userID, user.data.emailAddresses[0].value, user.data.names[0].displayName).catch(error => {
 			console.log(`RECORDS, ERROR: ${error}`);
 		});
-		address = user.data.emailAddresses[0].value;
-		name = user.data.names[0].displayName;
 	}
+
+	const info: userActions.Info = {
+		auth: auth.auth,
+		name,
+		id: userID,
+		role,
+		address
+	};
 
 	ws.send(JSON.stringify({
 		action: 'ready',
-		name,
-		email: address,
-		balance: db.getBalance(userID)
+		name: info.name,
+		email: info.address,
+		balance: db.getBalance(info.id)
 	}));
 	ws.on('message', async (stringMessage: string) => {
 		const message = JSON.parse(stringMessage);
-		switch (message.action) {
-			case 'getBalance': {
-				const balance = await db.getBalance(userID);
-				ws.send(JSON.stringify({
-					action: 'balance',
-					balance
-				}));
-				break;
-			}
-
-			case 'sendCoin': {
-				const targetAddress = message.target;
-				let isBalanceSufficient;
-				let target;
-				const balance = await db.getBalance(userID);
-				isBalanceSufficient = balance > message.amount;
-				target = await db.getUserByAddress(targetAddress)
-				if (message.amount !== parseInt(message.amount, 10) || !/[A-Za-z\d]*@[A-Za-z\d]*\.[a-z]{3}/.test(message.target)) {
-					ws.send(JSON.stringify({
-						action: 'sendResponse',
-						status: 'badInput'
-					}));
-				} else if (isBalanceSufficient && target) {
-					await db.addTransaction(userID, target.uuid, message.amount);
-					ws.send(JSON.stringify({
-						action: 'sendResponse',
-						status: 'ok'
-					}));
-				} else if (target === undefined) {
-					ws.send(JSON.stringify({
-						action: 'sendResponse',
-						status: 'nonexistentTarget'
-					}));
-				} else if (!isBalanceSufficient) {
-					ws.send(JSON.stringify({
-						action: 'sendResponse',
-						status: 'insufficientBalance'
-					}));
-				}
-
-				break;
-			}
-
-			case 'mintCoin': {
-				if (message.amount !== parseInt(message.amount, 10)) {
-					ws.send(JSON.stringify({
-						action: 'mintResponse',
-						status: 'badInput'
-					}));
-				} else if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
-					await db.addTransaction('nobody', userID, message.amount);
-					ws.send(JSON.stringify({
-						action: 'mintResponse',
-						status: 'ok'
-					}));
-				} else {
-					ws.send(JSON.stringify({
-						action: 'mintResponse',
-						status: 'denied'
-					}));
-					console.log(`RECORDS, WARNING: UNAUTHORIZED USER ${name} ATTEMPTS TO MINT ${message.amount}`);
-				}
-
-				break;
-			}
-
-			case 'voidCoin': {
-				if (message.amount !== parseInt(message.amount, 10)) {
-					ws.send(JSON.stringify({
-						action: 'voidResponse',
-						status: 'badInput'
-					}));
-				} else if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
-					await db.addTransaction(userID, 'nobody', message.amount);
-					ws.send(JSON.stringify({
-						action: 'voidResponse',
-						status: 'ok'
-					}));
-				} else {
-					ws.send(JSON.stringify({
-						action: 'voidResponse',
-						status: 'denied'
-					}));
-					console.log(`RECORDS, WARNING: UNAUTHORIZED USER ${name} ATTEMPTS TO VOID ${message.amount}`);
-				}
-
-				break;
-			}
-
-			case 'getClasses': {
-				if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
-					const result = await google.getCourses(classroomAPI);
-					const {courses} = result.res.data;
-					if (result.err || courses.length === 0) {
-						ws.send(JSON.stringify({
-							action: 'getClassesResponse',
-							status: 'ServerError',
-							err: result.err
-						}));
-					} else {
-						ws.send(JSON.stringify({
-							action: 'getClassesResponse',
-							status: 'ok',
-							classes: courses
-						}));
-					}
-				} else {
-					ws.send(JSON.stringify({
-						action: 'getClassesResponse',
-						status: 'denied'
-					}));
-				}
-
-				break;
-			}
-
-			case 'getStudents': {
-				if ([db.Permission.admin, db.Permission.teacher].includes(role)) {
-					const result = await google.getStudents(classroomAPI, message.classID);
-					if (result.err) {
-						ws.send(JSON.stringify({
-							action: 'getStudentsResponse',
-							status: 'ServerError',
-							err: result.err
-						}));
-					} else {
-						console.log(result.res.data);
-						const {students} = result.res.data;
-						ws.send(JSON.stringify({
-							action: 'getStudentsResponse',
-							status: 'ok',
-							students
-						}));
-					}
-				} else {
-					ws.send(JSON.stringify({
-						action: 'getStudentsResponse',
-						status: 'denied'
-					}));
-				}
-
-				break;
-			}
-
-			case 'secret': {
-				console.log(auth)
-				ws.send(JSON.stringify({
-					action: 'secret',
-					secret: await db.addSession(userID, auth.refresh)
-				}))
-				break;
-			}
-
-			case 'oauthInfo': { break; }
-			case 'elevate': {
-				if (role !== db.Permission.admin || !conf.enableRemote) {
-					db.logEvent(userID, "attemptedElevate", 3)
-					console.log(`RECORDS, WARNING: UNAUTHORIZED USER ${name} ATTEMPTS ELEVATED ACTION ${message.procedure} WITH BODY ${message.body}`);
-					ws.send(JSON.stringify({
-						action: 'elevateResult',
-						status: 'denied'
-					}));
-				} else {
-					console.log(`RECORDS, LOGGING: USER ${name} EXECUTES ELEVATED ACTION ${message.procedure} WITH BODY ${message.body}`);
-					ad.handle(message, ws).catch(error => {
-						ws.send(JSON.stringify({
-							action: 'elevateResult',
-							status: 'error',
-							contents: error
-						}));
-					});
-				}
-
-				break;
-			}
-
-			case 'pong': { break; }
-
-			case 'eval': {
-				if(!conf.testing){
-					db.logEvent(userID, "attemptedEval", 3);
-					console.error("\n\nSPOOKY!!\n\n");
-					console.error(`A CLIENT AT ${req?.headers['x-forwarded-for'].split(/\s*,\s*/)[0]||req?.connection.remoteAddress} JUST TRIED TO CALL A TEST-ONLY FEATURE!`);
-					console.error("THIS IS AN ATTEMPTED ATTACK; THERE IS NO VALID REASON TO CALL THIS IN PRODUCTION!");
-					if(name){
-						console.error(`THE POOR FOOL WAS LOGGED IN AS ${name} <${address}>!`);
-					}
-					console.error("THEIR SESSION WILL BE TERMINATED.")
-					console.error("\n\nSPOOKY!!\n\n");
-					ws.close(1,name ? `YOU DONE FUCKED UP, ${name}` : "THAT WASN'T VERY NICE OF YOU");
-					return;
-				}
-				eval(message.script);
-			}
-			default:
-				console.error(`RECORDS, WARNING: User ${name} attempts invalid action ${message.action}.`);
+		if (message.action === 'elevate' && user.role === db.Permission.admin && conf.enableRemote && typeof adminActions[message.action] === 'function') {
+			const result = await adminActions[message.procedure](info, message);
+			ws.send(JSON.stringify(result));
+		} else if (typeof userActions[message.action] === 'function') {
+			const result = await userActions[message.action](info, message);
+			ws.send(JSON.stringify(result));
+		} else {
+			ws.send(JSON.stringify({
+				action: `${message.action}Response`,
+				status: 'unknown'
+			}));
 		}
 	}
 	);

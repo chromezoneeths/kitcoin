@@ -39,4 +39,5 @@ commands.
 - help
     Returns this help message.`;
 
-export const testing = process.env.INSECURE_TESTING_MODE_IF_YOU_ENABLE_THIS_IN_PRODUCTION_IM_NOT_RESPONSIBLE_FOR_WHAT_HAPPENS_NEXT === "ENABLE"
+export const testing = process.env.INSECURE_TESTING_MODE_IF_YOU_ENABLE_THIS_IN_PRODUCTION_IM_NOT_RESPONSIBLE_FOR_WHAT_HAPPENS_NEXT === 'ENABLE';
+
