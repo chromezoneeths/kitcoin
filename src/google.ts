@@ -58,10 +58,8 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 				}
 
 				case 'secret': { // If the user wants to use their secret to use an existing session
-					const refresh = (await db.session.getBySecret(message.secret).catch(() => {
-						return {token: ''};
-					}));
-					if (refresh.token === '') { // If there is no token found in database for secret, tell the user to discard it.
+					const refresh = await db.session.getBySecret(message.secret)
+					if (typeof refresh === 'undefined') { // If there is no token found in database for secret, tell the user to discard it.
 						socket.send(JSON.stringify({
 							action: 'secret',
 							result: false

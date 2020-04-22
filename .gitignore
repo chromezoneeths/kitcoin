@@ -4,3 +4,4 @@ public/*
 dist/*
 /test_data
 /data
+/oauth.env

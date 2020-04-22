@@ -16,6 +16,7 @@ services:
       - "mongodb"
     depends_on:
       - mongodb
+    env_file: oauth.env
     environment:
       - DATABASE_ADDRESS=mongodb://mongodb
       - DATABASE_NAME=kitcoin
@@ -24,9 +25,6 @@ services:
       - DATABASE_PASSWORD=%%&change-this-please # Unused
       - WAIT_TO_CONNECT=0 # Number of seconds to wait before connecting to db
       - OAUTH_CALLBACK_URL=http://127.0.0.1:9876/oauth
-      # Quotes break OAuth stuff, make sure you remove them.
-      - OAUTH_CLIENT_ID=Your client ID goes here
-      - OAUTH_CLIENT_SECRET=Your client secret goes here
       - ENABLE_REMOTE=1 # Should be 0 in production unless needed, enables admin endpoints.
 volumes:
   kitcoin_db_volume:
