@@ -3,7 +3,6 @@ const express = require('express');
 import * as path from 'path';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import {v4 as uuid} from 'uuid';
 const logger = require('morgan');
 import oauthRouter from './routes/oauth';
 import usersRouter from './routes/users';
@@ -54,6 +53,7 @@ import * as db from './db';
 import * as userActions from './user';
 import * as adminActions from './admin';
 import WebSocket from 'ws';
+import {Request} from 'express';
 async function init(): Promise<void> {
 	await db.init().catch((error: Error) => {
 		throw error;
@@ -62,7 +62,7 @@ async function init(): Promise<void> {
 
 init();
 
-async function session(ws: WebSocket, _request): Promise<void> {
+async function session(ws: WebSocket, _request: Request): Promise<void> {
 	console.log('Got new connection');
 
 	ws.on('close', async () => {

@@ -1,9 +1,6 @@
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const tsProject = ts.createProject('tsconfig.json');
-const del = require('del');
-const path = require('path');
-const compose = require('docker-compose');
 
 gulp.task('default', () => {
 	return tsProject.src()
