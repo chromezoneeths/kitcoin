@@ -42,7 +42,7 @@ app.use((err, request, response, _next) => {
 
 	// Render the error page
 	response.status(err.status	|| 500);
-	response.render('error');
+	response.render('pages/error');
 });
 
 // Bits added to the end for the backend, probably awful and wrong.
