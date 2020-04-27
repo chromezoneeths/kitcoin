@@ -1,0 +1,34 @@
+{
+  "pages": [
+    {
+      "name": "Wallet",
+      "path": "/wallet",
+      "student": true,
+      "teacher": false
+    },
+    {
+      "name": "Earn",
+      "path": "/earn",
+      "student": true,
+      "teacher": false
+    },
+    {
+      "name": "Store",
+      "path": "/rewards",
+      "student": false,
+      "teacher": true
+    },
+    {
+      "name": "History",
+      "path": "/staff/history",
+      "student": true,
+      "teacher": true
+    },
+    {
+      "name": "Rewards",
+      "path": "/staff/rewards",
+      "student": false,
+      "teacher": true
+    }
+  ]
+}
