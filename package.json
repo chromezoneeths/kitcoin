@@ -32,6 +32,7 @@
 		"del": "^5.1.0",
 		"docker-compose": "^0.23.3",
 		"gulp": "^4.0.0",
+		"gulp-copy": "^4.0.1",
 		"gulp-typescript": "^6.0.0-alpha.1",
 		"jest-cli": "^25.3.0",
 		"typescript": "^3.8.3",
