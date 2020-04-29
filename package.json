@@ -33,6 +33,7 @@
 		"docker-compose": "^0.23.3",
 		"gulp": "^4.0.0",
 		"gulp-copy": "^4.0.1",
+		"gulp-sourcemaps": "^2.6.5",
 		"gulp-typescript": "^6.0.0-alpha.1",
 		"gulp-xo": "^0.24.0",
 		"jest-cli": "^25.3.0",

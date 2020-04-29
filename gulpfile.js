@@ -5,11 +5,14 @@ const gulpCopy = require('gulp-copy');
 const {watch} = require('gulp');
 const xo = require('gulp-xo');
 const {exec} = require('child_process');
+const sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('ts', () => {
 	return tsProject.src()
+		.pipe(sourcemaps.init())
 		.pipe(tsProject())
-		.js.pipe(gulp.dest('dist'));
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('dist'));
 });
 gulp.task('ejs', () => {
 	return gulp.src('./views/**')
@@ -39,7 +42,7 @@ gulp.task('restart', async cb => {
 	});
 	if (up) {
 		console.log('Kitcoin is running, rebuilding to apply changes…');
-		exec('docker-compose up --build -d', cb);
+		exec('docker-compose -f docker-compose.debug.yml up --build -d', cb);
 	} else {
 		console.log('Kitcoin isn’t running, so we won’t start it.');
 		cb();

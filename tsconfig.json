@@ -1,12 +1,11 @@
 {
-	"root": "src",
-	"include": [
-		"src/**.ts",
-		"src/routes/**.ts"
-	],
-	"compilerOptions": {
-		"target": "es5",
-		"esModuleInterop": true,
-		"resolveJsonModule": true
-	}
+  "root": "src",
+  "include": ["src/**.ts", "src/routes/**.ts"],
+  "compilerOptions": {
+    "target": "es5",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "sourceMap": true
+  }
 }
