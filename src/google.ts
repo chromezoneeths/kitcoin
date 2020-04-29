@@ -24,7 +24,7 @@ interface OAuthInfo {
 	auth: any;
 }
 
-export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
+export async function prepare(socket: WebSocket, cancel): Promise<OAuthInfo> {
 	return new Promise(resolve => { // Can't use fancy ES6 stuff here since I need to pass the resolve function around
 		const oAuthClient = new google.auth.OAuth2(
 			oauthKeys.clientId,
@@ -49,6 +49,12 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 						uuid: thisOAuthID
 					}))}`;
 					pendingOAuthCallbacks.push(thisPendingOAuth);
+					cancel(() => {
+						if (pendingOAuthCallbacks.includes(thisPendingOAuth)) {
+							pendingOAuthCallbacks.splice(pendingOAuthCallbacks.indexOf(thisPendingOAuth));
+						}
+					});
+
 					console.log(`Sending login message ${thisOAuthID}`);
 					socket.send(JSON.stringify({
 						action: 'login',
@@ -58,7 +64,7 @@ export async function prepare(socket: WebSocket): Promise<OAuthInfo> {
 				}
 
 				case 'secret': { // If the user wants to use their secret to use an existing session
-					const refresh = await db.session.getBySecret(message.secret)
+					const refresh = await db.session.getBySecret(message.secret);
 					if (typeof refresh === 'undefined') { // If there is no token found in database for secret, tell the user to discard it.
 						socket.send(JSON.stringify({
 							action: 'secret',
@@ -134,6 +140,7 @@ export async function callback(request: Request, response: Response, url: string
 					auth: i.client,
 					refresh: tokens.refresh_token
 				});
+				pendingOAuthCallbacks.splice(pendingOAuthCallbacks.indexOf(i));
 			}
 		}
 	}

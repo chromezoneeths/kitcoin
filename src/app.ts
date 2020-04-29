@@ -65,14 +65,20 @@ init();
 async function session(ws: WebSocket, _request: Request): Promise<void> {
 	console.log('Got new connection');
 
+	const googleCancelEvents: Array<() => void> = [];
+
 	ws.on('close', async () => {
 		console.log(`RECORDS, LOGGING: User ${name} has disconnected.`);
 		if (ping) {
 			clearInterval(ping);
 		}
+
+		googleCancelEvents.forEach(f => f());
 	});
 
-	const auth = await google.prepare(ws);
+	const auth = await google.prepare(ws, (cancel: () => void) => {
+		googleCancelEvents.push(cancel);
+	});
 	const peopleAPI = googleapis.people({
 		version: 'v1',
 		auth: auth.auth
