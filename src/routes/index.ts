@@ -1,9 +1,3 @@
-// RUN bin/www OR IT WILL BREAK
-
-if (!module.parent) {
-	throw new Error('no, bad');
-}
-
 import * as express from 'express';
 const router = express.Router();
 // Import * as fs from 'fs';

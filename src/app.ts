@@ -1,3 +1,4 @@
+	throw new Error('no, bad');
 import createError from 'http-errors';
 const express = require('express');
 import * as path from 'path';
