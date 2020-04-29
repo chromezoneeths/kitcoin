@@ -1,4 +1,9 @@
+// RUN bin/www OR IT WILL BREAK
+
+if (!module.parent) {
 	throw new Error('no, bad');
+}
+
 import createError from 'http-errors';
 const express = require('express');
 import * as path from 'path';
@@ -14,7 +19,7 @@ import cron from 'cron';
 const app = express();
 
 // View engine setup
-app.set('views', path.join(__dirname, 'views'));
+// app.set('views', path.join(/* __dirname, */'./views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
