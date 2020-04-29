@@ -19,9 +19,12 @@ gulp.task('static', () => {
 		.pipe(gulpCopy('./dist'));
 });
 gulp.task('lint', () => {
-	return gulp.src('**.*s')
+	return gulp.src('**.*s') // All *script files
 		.pipe(xo())
-		.pipe(xo.format());
+		.pipe(xo.format())
+		.pipe(xo.results(results => {
+			console.log(`Linting finished with ${results.warningCount} warnings and ${results.errorCount} errors.`);
+		}));
 });
 
 gulp.task('default', gulp.parallel(['ts', 'ejs', 'static']));
