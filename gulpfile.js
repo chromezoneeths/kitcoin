@@ -34,7 +34,7 @@ gulp.task('restart', async cb => {
 	const up = await new Promise(resolve => {
 		exec('docker-compose top', (err, stdout) => {
 			if (err) {
-				throw err;
+				console.log(err);
 			}
 
 			resolve(stdout.length > 1);
