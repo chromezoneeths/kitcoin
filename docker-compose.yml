@@ -9,7 +9,8 @@ services:
       - "kitcoin_db_volume:/data/db"
   kitcoin-main:
     restart: always
-    build: . # Replace this with a container tag in production
+    build: .
+    image: kitcoin:edge
     ports:
       - "9876:9876"
     links:

@@ -9,7 +9,8 @@ services:
       - "kitcoin_db_volume:/data/db"
   kitcoin-main:
     restart: always
-    build: . # Replace this with a container tag in production
+    build: .
+    image: kitcoin:debug
     command: node --inspect=0.0.0.0:9229 bin/www
     ports:
       - "9876:9876"
