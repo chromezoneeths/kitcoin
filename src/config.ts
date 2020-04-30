@@ -3,9 +3,9 @@
 export const dbIP: string = process.env.DATABASE_ADDRESS; // Allows you to set the IP address of the database.
 export const dbName: string = process.env.DATABASE_NAME || 'kitcoin';
 export const dbUser: string = process.env.DATABASE_USER; // Allows you to set the user this server uses to access the database.
-export const dbPort: number = parseInt(process.env.DATABASE_PORT, 10); // Allows you to set the database's port.
+export const dbPort: number = parseInt(process.env.DATABASE_PORT || '33060', 10); // Allows you to set the database's port.
 export const dbPassword: string = process.env.DATABASE_PASSWORD; // The password for the database user.
-export const waitTime: number = parseFloat(process.env.WAIT_TO_CONNECT); // Time to wait for MySQL to start in seconds.
+export const waitTime: number = parseFloat(process.env.WAIT_TO_CONNECT || '0'); // Time to wait for MySQL to start in seconds.
 export const oauthCallbackUrl: string = process.env.OAUTH_CALLBACK_URL; // Will have /oauthstage# appended to it. This should be routed to this server, through reverse proxy if necessary.
 export const enableRemote: boolean = process.env.ENABLE_REMOTE === '1';
 export const helpMessage = `

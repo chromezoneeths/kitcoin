@@ -31,6 +31,19 @@ This is the final repository for ETHS Kitcoin. We are using **NodeJS** and **Mon
 
 5. You can enter Mongo Shell to add administrators by running `docker-compose exec mongodb mongo`.
 
+## How to configure
+
+The following are environment variables that affect Kitcoin's behaviour. Required variables are in bold.
+
+- **DATABASE_ADDRESS**: The location of the MongoDB instance.
+- DATABASE_NAME: The name of the database. Defaults to 'kitcoin'.
+- DATABASE_USER: The username used to log in to the database. Defaults to no authentication.
+- DATABASE_PASSWORD: The password used to log in to the database.
+- DATABASE_PORT: The port used to connect to the database. Defaults to 33060.
+- WAIT_TO_CONNECT: Some number of seconds to wait before connecting to the database. Defaults to 0.
+- **OAUTH_CALLBACK_URL**: Some URL that is routed to the server's `/oauth`.
+- enableRemote: When set to 1, enables the admin API calls for privileged users.
+
 ## How it works
 
 1. User connects. **(app.ts:session)**
