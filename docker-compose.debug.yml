@@ -10,7 +10,7 @@ services:
   kitcoin-main:
     restart: always
     build: .
-    image: kitcoin:debug
+    image: docker.pkg.github.com/chromezoneeths/kitcoin/kitcoin:debug
     command: node --inspect=0.0.0.0:9229 bin/www
     ports:
       - "9876:9876"

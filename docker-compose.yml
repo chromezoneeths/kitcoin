@@ -1,4 +1,3 @@
-
 version: "2"
 services:
   mongodb:
@@ -11,7 +10,7 @@ services:
   kitcoin-main:
     restart: always
     build: .
-    image: kitcoin:edge
+    image: docker.pkg.github.com/chromezoneeths/kitcoin/kitcoin:edge
     ports:
       - "9876:9876"
     links:
