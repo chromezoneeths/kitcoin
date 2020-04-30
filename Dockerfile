@@ -1,5 +1,9 @@
 FROM node:lts
-EXPOSE 5000
 WORKDIR /app
-CMD npm run start
-COPY . .
+EXPOSE 9876
+CMD ["node", "./bin/www"]
+COPY package*.json ./
+RUN npm install --production
+COPY ./bin/www ./bin/www
+COPY ./clientJs ./clientJs
+COPY ./dist ./dist

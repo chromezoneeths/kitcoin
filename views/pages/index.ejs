@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ah, it's kitcoin time</title>
+
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' fonts.googleapis.com; font-src 'self' data: fonts.gstatic.com; connect-src 'self'; script-src 'self' bootswatch.com;"
+    />
+
+    <link
+      rel="stylesheet"
+      href="/node_modules/bootswatch/dist/flatly/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/static/index.css" />
+
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script async defer src="/static/index.js"></script>
+  </head>
+
+  <body>
+    <%- include('partials/navbar', { current: "Wallet", kind: "student", pages
+    })%>
+    <span id="top"></span>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

@@ -1,3 +1,7 @@
-node_modules
-data
-keys.js
+oauth_info.json
+node_modules/*
+public/*
+dist/*
+/test_data
+/data
+/oauth.env

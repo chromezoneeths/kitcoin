@@ -1,0 +1,24 @@
+{
+	"workbench.colorCustomizations": {
+		"activityBar.background": "#153509",
+		"titleBar.activeBackground": "#1D4A0D",
+		"titleBar.activeForeground": "#F6FDF3"
+	},
+	"cSpell.words": [
+		"adminpassword",
+		"adminusername",
+		"degrant",
+		"envs",
+		"fricked",
+		"kitcoin",
+		"mongodb",
+		"oauth",
+		"oauthstage",
+		"reslve",
+		"sadmin",
+		"urllib",
+		"wssessionmethod"
+	],
+	"javascript.format.enable": false,
+	"typescript.format.enable": false
+}
