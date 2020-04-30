@@ -1,6 +1,6 @@
 # KitCoin Final Project
 
-Development should be done on this branch, since it's built to a different docker tag.
+Commits should only be merged to this branch when they are at least as stable as what's already here.
 
 Google Classroom: 9n58eb
 
