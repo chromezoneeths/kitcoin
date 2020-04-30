@@ -21,7 +21,11 @@ jobs:
         run: gulp ci
       - name: Build
         run: docker build . --file Dockerfile --tag chromezoneeths/kitcoin/kitcoin:stable
-      - name: Login to DockerHub Registry
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin
+      - name: Log in to registry
+        uses: actions/docker/login@master
+        env:
+          DOCKER_REGISTRY_URL: docker.pkg.github.com
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       - name: Push
         run: docker push chromezoneeths/kitcoin/kitcoin:stable
