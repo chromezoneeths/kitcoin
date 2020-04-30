@@ -1,8 +1,10 @@
 # KitCoin Final Project
 
+Push development changes either to your own branch or to `edge`. This branch should be used in any production deployments.
+
 Google Classroom: 9n58eb
 
-This is the final repository for ETHS Kitcoin. **Please do not push to the master branch.** We are using **NodeJS** and **MongoDB**. If you are wanting to help out, make a branch and commit to there.
+This is the final repository for ETHS Kitcoin. We are using **NodeJS** and **MongoDB**.
 
 ## Responsibilities
 
