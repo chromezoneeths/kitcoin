@@ -20,11 +20,11 @@ jobs:
       - name: Compile
         run: gulp ci
       - name: Build
-        run: docker build . --file Dockerfile --tag chromezoneeths/kitcoin/kitcoin:stable
+        run: docker build . --file Dockerfile --tag docker.pkg.github.com/chromezoneeths/kitcoin/kitcoin:stable
       - uses: azure/docker-login@v1
         with:
           login-server: "docker.pkg.github.com" # default: index.docker.io
           username: "${{ github.actor }}"
           password: "${{ secrets.GITHUB_TOKEN }}"
       - name: Push
-        run: docker push https://docker.pkg.github.cpm/chromezoneeths/kitcoin/kitcoin:stable
+        run: docker push docker.pkg.github.com/chromezoneeths/kitcoin/kitcoin:stable
