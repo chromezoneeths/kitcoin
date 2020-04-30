@@ -19,6 +19,9 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
+          
+      - name: Install Node.js dependencies
+        run: npm install
 
       - name: Run linters
         uses: samuelmeuli/lint-action@v1
