@@ -27,4 +27,4 @@ jobs:
           username: "${{ github.actor }}"
           password: "${{ secrets.GITHUB_TOKEN }}"
       - name: Push
-        run: docker push docker.pkg.github.cpm/chromezoneeths/kitcoin/kitcoin:stable
+        run: docker push docker.pkg.github.com/chromezoneeths/kitcoin/kitcoin:stable
