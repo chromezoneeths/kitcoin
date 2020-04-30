@@ -50,6 +50,7 @@ gulp.task('restart', async cb => {
 });
 
 gulp.task('default', gulp.parallel([gulp.series('ts', 'restart'), 'ejs', 'static']));
+gulp.task('ci', gulp.parallel(['ts', 'ejs', 'static']));
 
 gulp.task('watch', () => {
 	watch('src/**/*.ts', gulp.series('lint', 'ts', 'restart'));
