@@ -21,5 +21,7 @@ jobs:
         run: gulp ci
       - name: Build
         run: docker build . --file Dockerfile --tag chromezoneeths/kitcoin/kitcoin:edge
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin
       - name: Push
         run: docker push chromezoneeths/kitcoin/kitcoin:edge
