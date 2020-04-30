@@ -1,5 +1,9 @@
 # KitCoin Final Project
 
+| Stable  | Edge |
+| ------------- | ------------- |
+| [![Build Status](https://jenkins.spaghet.us/buildStatus/icon?job=CodETHS%2FKitcoin%2FKitcoin+Stable)](https://jenkins.spaghet.us/job/CodETHS/job/Kitcoin/job/Kitcoin%20Stable/) | [![Build Status](https://jenkins.spaghet.us/buildStatus/icon?job=CodETHS%2FKitcoin%2FKitcoin+Edge)](https://jenkins.spaghet.us/job/CodETHS/job/Kitcoin/job/Kitcoin%20Edge/) |
+
 Push development changes either to your own branch or to `edge`. This branch should be used in any production deployments.
 
 Google Classroom: 9n58eb
