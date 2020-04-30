@@ -15,4 +15,4 @@ This is the final repository for ETHS Kitcoin. **Please do not push to the maste
   * Oliver (leader, dev)
   * Albert (Google Classroom API lead, dev)
   * Mateo (express lead, dev)
-  * Tucker
+  * Tucker (lead deployment expert, dev)
