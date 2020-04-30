@@ -20,7 +20,7 @@ jobs:
       - name: Compile
         run: gulp ci
       - name: Build
-        run: docker build . --file Dockerfile --tag chromezoneeths/kitcoin/kitcoin:edge
+        run: docker build . --file Dockerfile --tag docker.pkg.github.cpm/chromezoneeths/kitcoin/kitcoin:edge
       - uses: azure/docker-login@v1
         with:
           login-server: "docker.pkg.github.com" # default: index.docker.io
