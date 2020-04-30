@@ -58,6 +58,7 @@ import * as conf from './config';
 import * as db from './db';
 import * as userActions from './user';
 import * as adminActions from './admin';
+import { v4 as uuid } from 'uuid';
 import WebSocket from 'ws';
 import {Request} from 'express';
 async function init(): Promise<void> {
@@ -111,6 +112,7 @@ async function session(ws: WebSocket, _request: Request): Promise<void> {
 		role = userQuery.role;
 		role = userQuery.role;
 	} else {
+		userID = uuid()
 		await db.user.add(userID, user.data.emailAddresses[0].value, user.data.names[0].displayName).catch(error => {
 			console.log(`RECORDS, ERROR: ${error}`);
 		});
