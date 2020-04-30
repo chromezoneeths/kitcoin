@@ -1,6 +1,14 @@
 # KitCoin Final Project
 
+| Stable | Edge |
+| ------------- | ------------- |
+| [![Build Status](https://jenkins.spaghet.us/buildStatus/icon?job=CodETHS%2FKitcoin%2FKitcoin+Stable)](https://jenkins.spaghet.us/job/CodETHS/job/Kitcoin/job/Kitcoin%20Stable/) | [![Build Status](https://jenkins.spaghet.us/buildStatus/icon?job=CodETHS%2FKitcoin%2FKitcoin+Edge)](https://jenkins.spaghet.us/job/CodETHS/job/Kitcoin/job/Kitcoin%20Edge/) |
+
 Development should be done on this branch, since it's built to a different docker tag.
+
+Google Classroom: 9n58eb
+
+This is the final repository for ETHS Kitcoin. We are using **NodeJS** and **MongoDB**.
 
 ## Responsibilities
 
