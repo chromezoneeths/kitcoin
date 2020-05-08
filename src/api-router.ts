@@ -4,7 +4,7 @@ import * as userActions from './user';
 const router = express.Router();
 
 /* GET home page. */
-router.get('/api', async (request, response) => {
+router.get('/', async (request, response) => {
 	const user = await session(request);
 	if (user) {
 		const message = request.body;
@@ -22,9 +22,26 @@ router.get('/api', async (request, response) => {
 			response.sendStatus(404);
 			response.end();
 		}
+	} else if (request.headers.authorization) {
+		response.send('bad-session');
 	} else {
-		response.sendStatus(401);
-		response.end();
+		response.send('no-session');
+	}
+});
+
+router.get('/check', async (request, response) => {
+	const user = await session(request);
+	if (user) {
+		response.send(JSON.stringify({
+			name: user.name,
+			address: user.address,
+			role: user.role,
+			status: true
+		}));
+	} else if (request.headers.authorization) {
+		response.send('bad-session');
+	} else {
+		response.send('no-session');
 	}
 });
 
