@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as db from './db';
 import * as userActions from './user';
+import {Request} from 'express-serve-static-core';
 const router = express.Router();
 
 /* GET home page. */
@@ -30,13 +31,13 @@ router.get('/', async (request, response) => {
 });
 
 router.get('/check', async (request, response) => {
+	console.log('Checking user\'s session...');
 	const user = await session(request);
-	if (user) {
+	if (user !== undefined) {
 		response.send(JSON.stringify({
 			name: user.name,
 			address: user.address,
-			role: user.role,
-			status: true
+			role: user.role
 		}));
 	} else if (request.headers.authorization) {
 		response.send('bad-session');
@@ -47,16 +48,16 @@ router.get('/check', async (request, response) => {
 
 export default router;
 
-async function session(request): Promise<db.User|false> {
+async function session(request: Request): Promise<db.User | undefined> {
 	if (request.headers.authorization) {
-		const secret = await db.session.getBySecret(request.headers.authorization);
-		const user = await db.user.getById(secret.user);
+		const session = await db.session.getBySecret(request.headers.authorization);
+		if (session === undefined) {
+			return;
+		}
+
+		const user = await db.user.getById(session.user);
 		if (user) {
 			return user;
 		}
-
-		return false;
 	}
-
-	return false;
 }
