@@ -198,6 +198,8 @@ export const user = {
 			balance -= doc.amount;
 		}
 
+		cache.balance.set(uuid, balance);
+
 		return balance;
 	},
 	async list(): Promise<User[]> {

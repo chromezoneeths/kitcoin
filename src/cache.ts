@@ -28,7 +28,7 @@ export const balance = {
 
 		return NaN;
 	},
-	async set(user: string, value: string): Promise<void> {
+	async set(user: string, value: number): Promise<void> {
 		if (enabled) {
 			await setAsync(`${user}::balance`, value);
 		}
