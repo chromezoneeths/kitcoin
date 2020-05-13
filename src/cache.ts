@@ -45,7 +45,7 @@ export const balance = {
 					return;
 				}
 
-				await balance.set(sender, (original - amount).toString());
+				await balance.set(sender, original - amount);
 			},
 			async () => { // Decrement sender
 				const original = await balance.get(sender);
@@ -53,7 +53,7 @@ export const balance = {
 					return;
 				}
 
-				await balance.set(recipient, (original + amount).toString());
+				await balance.set(recipient, original + amount);
 			}
 		]);
 	}
