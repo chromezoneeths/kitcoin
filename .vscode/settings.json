@@ -15,7 +15,9 @@
 		"mongodb",
 		"oauth",
 		"oauthstage",
+		"promisify",
 		"reslve",
+		"roke",
 		"sadmin",
 		"urllib",
 		"wssessionmethod"

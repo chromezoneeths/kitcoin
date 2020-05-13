@@ -1,5 +1,7 @@
 // This file loads configuration from environment variables.
 
+export const redisHost: string = process.env.REDIS_ADDRESS;
+export const redisPort: number = parseInt(process.env.REDIS_PORT, 10) || 6379;
 export const dbIP: string = process.env.DATABASE_ADDRESS; // Allows you to set the IP address of the database.
 export const dbName: string = process.env.DATABASE_NAME || 'kitcoin';
 export const dbUser: string = process.env.DATABASE_USER; // Allows you to set the user this server uses to access the database.

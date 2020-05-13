@@ -1,6 +1,7 @@
 // This file contains abstractions for database calls. It should also  do any injection filtering.
 import * as mongo from 'mongodb';
 import * as conf from './config';
+import * as cache from './cache';
 import {v4 as uuid} from 'uuid';
 import * as crypto from 'crypto';
 let client: mongo.MongoClient;
@@ -114,16 +115,19 @@ export enum Permission {
 	vendor,
 }
 export const transaction = {
-	async add(sender: string, recipient: string, amount: string): Promise<void> {
-	// Await client.connect();
-		const db = client.db(conf.dbName);
-		await db.collection('transactions').insertOne({
+	async add(sender: string, recipient: string, amount: number): Promise<void> {
+		const transaction: Transaction = {
 			uuid: uuid(),
-			timestamp: (new Date(Date.now())).toISOString(),
+			timestamp: (new Date(Date.now())),
 			sender,
 			recipient,
 			amount
-		});
+		};
+		// Await client.connect();
+		const db = client.db(conf.dbName);
+		await db.collection('transactions').insertOne(transaction);
+
+		await cache.balance.transaction(transaction);
 	},
 	async remove(id: string): Promise<void> {
 	// Await client.connect();
@@ -173,7 +177,12 @@ export const user = {
 		});
 	},
 	async balance(uuid: string): Promise<number> {
-		let balance = 0;
+		let balance = await cache.balance.get(uuid);
+		if (!isNaN(balance)) {
+			return balance;
+		}
+
+		balance = 0;
 		// Await client.connect();
 		const db = client.db(conf.dbName);
 		const transactions = db.collection('transactions');
@@ -301,3 +310,6 @@ export const session = {
 	}
 };
 
+process.on('SIGINT', () => {
+	client.close();
+});

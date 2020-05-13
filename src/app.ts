@@ -153,12 +153,6 @@ async function session(ws: WebSocket, _request: Request): Promise<void> {
 module.exports.app = app;
 module.exports.wssessionmethod = session;
 
-// Explicitly handle SIGINT since docker treats node as init and won't kill it otherwise
-process.on('SIGINT', () => {
-	// It doesn't output anything, but it will die after a few seconds like it should.
-	process.exit();
-});
-
 // Automatically restart at midnight to prevent any memory leakage over time
 {
 	const job = new cron.CronJob('0 0 * * *', () => {
