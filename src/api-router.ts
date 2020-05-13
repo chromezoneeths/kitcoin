@@ -31,7 +31,7 @@ router.get('/', async (request, response) => {
 });
 
 router.get('/check', async (request, response) => {
-	console.log('Checking user’s session...');
+	console.log('Checking user’s session…');
 	const user = await session(request);
 	if (user !== undefined) {
 		response.send(JSON.stringify({
