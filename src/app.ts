@@ -1,7 +1,9 @@
 // RUN bin/www OR IT WILL BREAK
 
+// TODO: Someone who knows more about express document this
+
 if (!module.parent) {
-	throw new Error('no, bad');
+	throw new Error('no, bad'); // Prevents me from forgetting about bin/www and making that mistake again
 }
 
 import createError from 'http-errors';
@@ -35,6 +37,7 @@ app.use('/oauth', oauthRouter);
 app.use('/api', ApiRouter);
 
 // Catch 404 and forward to error handler
+// TODO: something in error handling is broken?
 app.use((request, response, next) => {
 	next(createError(404));
 });
