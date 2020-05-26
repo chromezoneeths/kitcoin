@@ -14,7 +14,6 @@ import oauthRouter from './routes/oauth';
 import usersRouter from './routes/users';
 import indexRouter from './routes/index';
 import ApiRouter from './api-router';
-import cron from 'cron';
 
 const app = express();
 
@@ -152,11 +151,3 @@ async function session(ws: WebSocket, _request: Request): Promise<void> {
 
 module.exports.app = app;
 module.exports.wssessionmethod = session;
-
-// Automatically restart at midnight to prevent any memory leakage over time
-{
-	const job = new cron.CronJob('0 0 * * *', () => {
-		process.kill(process.pid, 'SIGINT');
-	});
-	job.start();
-}
