@@ -61,5 +61,6 @@
       "line": 198,
       "description": "This action stores a new session in the database and returns the session secret to the user."
     }
-  ]
+  ],
+  "ref": "e780d1924cb8ae5d2d99f93f00492246cfd6056a"
 }
