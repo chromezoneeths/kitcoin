@@ -1,0 +1,65 @@
+{
+  "title": "how sessions are made",
+  "steps": [
+    {
+      "file": "src/app.ts",
+      "line": 75,
+      "description": "it begins\n\n(somehow bin/www does this, but i don't know how)"
+    },
+    {
+      "file": "src/app.ts",
+      "line": 88,
+      "description": "We need to authenticate the user first"
+    },
+    {
+      "file": "src/google.ts",
+      "line": 29,
+      "description": "Authentication happens in this file"
+    },
+    {
+      "file": "src/google.ts",
+      "line": 37,
+      "description": "We receive a message from the client, asking for a URI. The client will open this URI in a browser and log in."
+    },
+    {
+      "file": "src/google.ts",
+      "line": 44,
+      "description": "This URI leads to oauthstage1, which we'll look at later in the tour."
+    },
+    {
+      "file": "src/google.ts",
+      "line": 51,
+      "description": "We'll store this Promise's resolve function for use in OAuthStage3, along with our Google authentication stuff and an ID to keep track of different sessions."
+    },
+    {
+      "file": "src/google.ts",
+      "line": 59,
+      "description": "We finally tell the client to open oauthstage1."
+    },
+    {
+      "file": "clientJs/stage1.js",
+      "line": 1,
+      "description": "When oauthstage1 is loaded on the client, it stores the login flow ID for use in stages 2 and 3, then redirects to Google. Google then redirects us to stage 2."
+    },
+    {
+      "file": "clientJs/stage2.js",
+      "line": 1,
+      "description": "Stage 2 loads the UUID we stored in stage 1, adds it to the query string, and redirects to stage 3."
+    },
+    {
+      "file": "src/google.ts",
+      "line": 143,
+      "description": "We take the flow ID and Google secret from the query string. We use the secret to get our tokens, and we use the flow ID to finish up the Promise we created in prepare(). The user is now logged in. Finally, we clean up our entry in the pendingOAuthCallbacks array."
+    },
+    {
+      "file": "src/app.ts",
+      "line": 138,
+      "description": "Now that the client is logged in, they can get a session token for later use via the `secret` or `session` actions. They should do this immediately upon login, if the user has requested it."
+    },
+    {
+      "file": "src/user.ts",
+      "line": 198,
+      "description": "This action stores a new session in the database and returns the session secret to the user."
+    }
+  ]
+}

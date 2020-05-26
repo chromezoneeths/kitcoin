@@ -1,0 +1,25 @@
+{
+  "title": "how sessions are re-used",
+  "steps": [
+    {
+      "file": "src/app.ts",
+      "line": 88,
+      "description": "Session recovery starts in the same place as session creation."
+    },
+    {
+      "file": "src/google.ts",
+      "line": 36,
+      "description": "This is where session recovery starts to differ - the client will ask us to check its session, instead of asking for a Google URI."
+    },
+    {
+      "file": "src/google.ts",
+      "line": 67,
+      "description": "We look up their session token in the database. If it doesn't exist, we'll tell them to ask for a Google URI instead."
+    },
+    {
+      "file": "src/google.ts",
+      "line": 82,
+      "description": "If we find their session, we use the refresh token to get a Google session and return that."
+    }
+  ]
+}
