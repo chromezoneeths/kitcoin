@@ -198,6 +198,8 @@ export async function secret(info: Info): Promise<any> {
 	};
 }
 
+export const session = secret;
+
 export async function revokeTransaction(info: Info, message: any): Promise<any> {
 	const target = await db.transaction.get(message.target);
 	if (target.sender === info.id || target.recipient === info.id) { // This transaction belongs to this user
