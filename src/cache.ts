@@ -1,24 +1,34 @@
+import {createClient, RedisClient} from 'redis';
+import {promisify} from 'util';
 import {Transaction} from './db';
 
-import * as conf from './config';
+import conf from './config';
 
-let enabled = Boolean(conf.redisHost);
+console.log(conf);
 
-import {createClient} from 'redis';
-const client = createClient({
-	host: conf.redisHost,
-	port: conf.redisPort
-});
-import {promisify} from 'util';
-const getAsync = promisify(client.get).bind(client);
-const setAsync = promisify(client.set).bind(client);
+let enabled = typeof conf.redisHost === 'string';
 
-client.on('error', error => {
-	console.error('redis machine 🅱roke');
-	console.error(error);
-	console.error('disabling redis for this session');
-	enabled = false;
-});
+let getAsync: (arg0: string) => string | PromiseLike<string>;
+let setAsync: (arg0: string, arg1: number) => any;
+let client: RedisClient;
+
+export async function init(): Promise<void> {
+	console.log(`Connecting to cache at ${conf.redisHost}`);
+
+	client = createClient({
+		host: conf.redisHost,
+		port: conf.redisPort
+	});
+	getAsync = promisify(client.get).bind(client);
+	setAsync = promisify(client.set).bind(client);
+
+	client.on('error', error => {
+		console.error('redis machine 🅱roke');
+		console.error(error);
+		console.error('disabling redis for this session');
+		enabled = false;
+	});
+}
 
 export const balance = {
 	async get(user: string): Promise<number> {

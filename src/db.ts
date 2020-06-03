@@ -1,6 +1,6 @@
 // This file contains abstractions for database calls. It should also  do any injection filtering.
 import * as mongo from 'mongodb';
-import * as conf from './config';
+import conf from './config';
 import * as cache from './cache';
 import {v4 as uuid} from 'uuid';
 import * as crypto from 'crypto';
@@ -77,7 +77,8 @@ export async function init(): Promise<void> {
 					{timestamp: {$type: 'date'}}
 				]
 			}
-		})
+		}),
+		cache.init()
 	]);
 	console.log('RECORDS, LOGGING: All collections have been created.');
 }

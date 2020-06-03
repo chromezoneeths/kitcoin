@@ -56,7 +56,7 @@ app.use((err, request, response, _next) => {
 // Bits added to the end for the backend, probably awful and wrong.
 
 const googleapis = require('googleapis').google;
-import * as conf from './config';
+import conf from './config';
 import * as db from './db';
 import * as userActions from './user';
 import * as adminActions from './admin';
