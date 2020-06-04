@@ -56,7 +56,7 @@ app.use((err, request, response, _next) => {
 // Bits added to the end for the backend, probably awful and wrong.
 
 const googleapis = require('googleapis').google;
-import conf from './config';
+const conf = require('./config');
 import * as db from './db';
 import * as userActions from './user';
 import * as adminActions from './admin';
@@ -68,6 +68,8 @@ async function init(): Promise<void> {
 		throw error;
 	});
 }
+
+console.log(conf);
 
 init();
 

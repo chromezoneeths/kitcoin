@@ -1,6 +1,6 @@
 // This file loads configuration from environment variables.
 
-exports = {
+module.exports = {
 	get redisHost(): string {
 		return process.env.REDIS_ADDRESS;
 	},
@@ -65,5 +65,3 @@ commands.
 - help
     Returns this help message.`
 };
-
-export default exports;

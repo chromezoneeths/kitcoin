@@ -1,5 +1,5 @@
 // This file contains abstractions for Google APIs.
-import conf from './config';
+const conf = require('./config');
 import {v4 as uuid} from 'uuid';
 import * as urllib from 'url';
 import * as db from './db';

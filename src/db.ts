@@ -1,6 +1,6 @@
 // This file contains abstractions for database calls. It should also  do any injection filtering.
 import * as mongo from 'mongodb';
-import conf from './config';
+const conf = require('./config');
 import * as cache from './cache';
 import {v4 as uuid} from 'uuid';
 import * as crypto from 'crypto';

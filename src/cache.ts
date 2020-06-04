@@ -2,9 +2,7 @@ import {createClient, RedisClient} from 'redis';
 import {promisify} from 'util';
 import {Transaction} from './db';
 
-import conf from './config';
-
-console.log(conf);
+const conf = require('./config');
 
 let enabled = typeof conf.redisHost === 'string';
 
