@@ -5,5 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Write dummy oauth
+        run: touch oauth.env
       - name: Run tests
         run: bash tests.sh
