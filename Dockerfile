@@ -1,11 +1,11 @@
-FROM node:lts
+FROM node:14
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run-script ci
 
-FROM node:lts
+FROM node:14
 WORKDIR /app
 EXPOSE 9876
 CMD ["node", "./bin/www"]
