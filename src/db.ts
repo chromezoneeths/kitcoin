@@ -8,7 +8,7 @@ let client: mongo.MongoClient;
 export async function init(): Promise<void> {
 	console.log(`Waiting ${conf.waitTime} seconds for db`);
 	await new Promise(resolve => setTimeout(resolve, conf.waitTime * 1000));
-	console.log('RECORDS, LOGGING: Connecting to database at ' + conf.dbIP);
+	console.log(`RECORDS, LOGGING: Connecting to database at ${conf.dbIP}`);
 	client = new mongo.MongoClient(conf.dbIP, {useNewUrlParser: true, useUnifiedTopology: true});
 	await client.connect();
 	console.log('RECORDS, LOGGING: Connection successful, ensuring everything is ready');
