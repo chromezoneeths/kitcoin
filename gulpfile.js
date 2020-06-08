@@ -8,22 +8,22 @@ const {exec} = require('child_process');
 const sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('ts', () => {
-	return tsProject.src()
+	return gulp.src('src/**/*.ts', {since: gulp.lastRun('ts')})
 		.pipe(sourcemaps.init())
 		.pipe(tsProject())
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('dist'));
 });
 gulp.task('ejs', () => {
-	return gulp.src('./views/**')
+	return gulp.src('./views/**', {since: gulp.lastRun('ejs')})
 		.pipe(gulpCopy('./dist'));
 });
 gulp.task('static', () => {
-	return gulp.src('./static/**')
+	return gulp.src('./static/**', {since: gulp.lastRun('static')})
 		.pipe(gulpCopy('./dist'));
 });
 gulp.task('lint', () => {
-	return gulp.src('**.*s') // All *script files
+	return gulp.src('**.*s', {since: gulp.lastRun('lint')}) // All *script files
 		.pipe(xo())
 		.pipe(xo.format())
 		.pipe(xo.results(results => {
