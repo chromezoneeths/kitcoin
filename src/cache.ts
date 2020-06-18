@@ -1,24 +1,32 @@
+import {createClient, RedisClient} from 'redis';
+import {promisify} from 'util';
 import {Transaction} from './db';
 
-import * as conf from './config';
+const conf = require('./config');
 
-let enabled = Boolean(conf.redisHost);
+let enabled = typeof conf.redisHost === 'string';
 
-import {createClient} from 'redis';
-const client = createClient({
-	host: conf.redisHost,
-	port: conf.redisPort
-});
-import {promisify} from 'util';
-const getAsync = promisify(client.get).bind(client);
-const setAsync = promisify(client.set).bind(client);
+let getAsync: (arg0: string) => string | PromiseLike<string>;
+let setAsync: (arg0: string, arg1: number) => any;
+let client: RedisClient;
 
-client.on('error', error => {
-	console.error('redis machine 🅱roke');
-	console.error(error);
-	console.error('disabling redis for this session');
-	enabled = false;
-});
+export async function init(): Promise<void> {
+	console.log(`Connecting to cache at ${conf.redisHost}`);
+
+	client = createClient({
+		host: conf.redisHost,
+		port: conf.redisPort
+	});
+	getAsync = promisify(client.get).bind(client);
+	setAsync = promisify(client.set).bind(client);
+
+	client.on('error', error => {
+		console.error('redis machine 🅱roke');
+		console.error(error);
+		console.error('disabling redis for this session');
+		enabled = false;
+	});
+}
 
 export const balance = {
 	async get(user: string): Promise<number> {
@@ -28,7 +36,7 @@ export const balance = {
 
 		return NaN;
 	},
-	async set(user: string, value: string): Promise<void> {
+	async set(user: string, value: number): Promise<void> {
 		if (enabled) {
 			await setAsync(`${user}::balance`, value);
 		}
@@ -45,7 +53,7 @@ export const balance = {
 					return;
 				}
 
-				await balance.set(sender, (original - amount).toString());
+				await balance.set(sender, original - amount);
 			},
 			async () => { // Decrement sender
 				const original = await balance.get(sender);
@@ -53,7 +61,7 @@ export const balance = {
 					return;
 				}
 
-				await balance.set(recipient, (original + amount).toString());
+				await balance.set(recipient, original + amount);
 			}
 		]);
 	}

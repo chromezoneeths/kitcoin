@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// TODO: someone document this file, i have no idea what it's for and i'm afraid to touch it
+
 /**
  * Module dependencies.
  */

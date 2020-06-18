@@ -1,6 +1,6 @@
 // This file contains abstractions for database calls. It should also  do any injection filtering.
 import * as mongo from 'mongodb';
-import * as conf from './config';
+const conf = require('./config');
 import * as cache from './cache';
 import {v4 as uuid} from 'uuid';
 import * as crypto from 'crypto';
@@ -8,7 +8,7 @@ let client: mongo.MongoClient;
 export async function init(): Promise<void> {
 	console.log(`Waiting ${conf.waitTime} seconds for db`);
 	await new Promise(resolve => setTimeout(resolve, conf.waitTime * 1000));
-	console.log('RECORDS, LOGGING: Connecting to database at ' + conf.dbIP);
+	console.log(`RECORDS, LOGGING: Connecting to database at ${conf.dbIP}`);
 	client = new mongo.MongoClient(conf.dbIP, {useNewUrlParser: true, useUnifiedTopology: true});
 	await client.connect();
 	console.log('RECORDS, LOGGING: Connection successful, ensuring everything is ready');
@@ -77,7 +77,8 @@ export async function init(): Promise<void> {
 					{timestamp: {$type: 'date'}}
 				]
 			}
-		})
+		}),
+		cache.init()
 	]);
 	console.log('RECORDS, LOGGING: All collections have been created.');
 }
@@ -197,6 +198,8 @@ export const user = {
 			const doc = await out.next();
 			balance -= doc.amount;
 		}
+
+		cache.balance.set(uuid, balance);
 
 		return balance;
 	},

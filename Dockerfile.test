@@ -8,9 +8,10 @@ RUN npm run-script ci
 FROM node:14
 WORKDIR /app
 EXPOSE 9876
-CMD ["node", "./bin/www"]
+CMD npm test
 COPY --from=0 --chown=0:0 /app/dist ./dist
 COPY --from=0 /app/clientJs ./clientJs
 COPY --from=0 /app/bin ./bin
+COPY --from=0 /app/test ./test
 COPY --from=0 /app/package*.json ./
-RUN npm i --production
+COPY --from=0 /app/node_modules ./node_modules

@@ -1,5 +1,5 @@
 import * as db from './db';
-import * as config from './config';
+const config = require('./config');
 import {Info} from './user';
 
 export async function listUsers(): Promise<any> {

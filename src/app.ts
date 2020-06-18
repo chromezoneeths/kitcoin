@@ -1,7 +1,9 @@
 // RUN bin/www OR IT WILL BREAK
 
+// TODO: Someone who knows more about express document this
+
 if (!module.parent) {
-	throw new Error('no, bad');
+	throw new Error('no, bad'); // Prevents me from forgetting about bin/www and making that mistake again
 }
 
 import createError from 'http-errors';
@@ -14,7 +16,6 @@ import oauthRouter from './routes/oauth';
 import usersRouter from './routes/users';
 import indexRouter from './routes/index';
 import ApiRouter from './api-router';
-import cron from 'cron';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/oauth', oauthRouter);
 app.use('/api', ApiRouter);
 
 // Catch 404 and forward to error handler
+// TODO: something in error handling is broken?
 app.use((request, response, next) => {
 	next(createError(404));
 });
@@ -54,7 +56,7 @@ app.use((err, request, response, _next) => {
 // Bits added to the end for the backend, probably awful and wrong.
 
 const googleapis = require('googleapis').google;
-import * as conf from './config';
+const conf = require('./config');
 import * as db from './db';
 import * as userActions from './user';
 import * as adminActions from './admin';
@@ -66,6 +68,8 @@ async function init(): Promise<void> {
 		throw error;
 	});
 }
+
+console.log(conf);
 
 init();
 
@@ -152,11 +156,3 @@ async function session(ws: WebSocket, _request: Request): Promise<void> {
 
 module.exports.app = app;
 module.exports.wssessionmethod = session;
-
-// Automatically restart at midnight to prevent any memory leakage over time
-{
-	const job = new cron.CronJob('0 0 * * *', () => {
-		process.kill(process.pid, 'SIGINT');
-	});
-	job.start();
-}

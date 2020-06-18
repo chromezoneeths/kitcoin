@@ -1,0 +1,13 @@
+{
+	// Create a file at /etc/kitcoin.json or ./config.json and populate any properties you want to override. Unpopulated properties will be read from environment.
+	"redisHost": "localhost",
+	"redisPort": 6379,
+	"dbIP": "mongodb://localhost",
+	"dbName": "kitcoin",
+	"dbUser": "kitcoin",
+	"dbPassword": "kitcoin",
+	"dbPort": "33060",
+	"waitTime": "3",
+	"oauthCallbackUrl": "https://localhost",
+	"enableRemote": false
+}

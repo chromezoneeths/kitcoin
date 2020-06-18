@@ -7,6 +7,8 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD='%%&change-this-please'
     volumes:
       - "kitcoin_db_volume:/data/db"
+  redis:
+    image: "redis"
   kitcoin-main:
     restart: always
     build: .
@@ -15,8 +17,10 @@ services:
       - "9876:9876"
     links:
       - "mongodb"
+      - "redis"
     depends_on:
       - mongodb
+      - redis
     env_file: oauth.env
     environment:
       - DATABASE_ADDRESS=mongodb://mongodb
@@ -24,6 +28,7 @@ services:
       - DATABASE_USER=root # Unused
       - DATABASE_PORT=33060 # Unused
       - DATABASE_PASSWORD=%%&change-this-please # Unused
+      - REDIS_ADDRESS=redis
       - WAIT_TO_CONNECT=0 # Number of seconds to wait before connecting to db
       - OAUTH_CALLBACK_URL=http://127.0.0.1:9876/oauth
       - ENABLE_REMOTE=1 # Should be 0 in production unless needed, enables admin endpoints.

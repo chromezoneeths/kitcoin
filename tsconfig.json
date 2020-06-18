@@ -1,11 +1,18 @@
 {
-  "root": "src",
-  "include": ["src/**.ts", "src/routes/**.ts"],
-  "compilerOptions": {
-    "target": "es5",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "outDir": "./dist",
-    "sourceMap": true
-  }
+	"root": "src",
+	"include": [
+		"src/**.ts",
+		"src/routes/**.ts"
+	],
+	"compilerOptions": {
+		"lib": [
+			"ES2020"
+		],
+		"module": "CommonJS",
+		"target": "ES2020",
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"outDir": "./dist",
+		"sourceMap": true
+	}
 }

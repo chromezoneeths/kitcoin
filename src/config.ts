@@ -1,33 +1,82 @@
-// This file loads configuration from environment variables.
+// This file loads configuration from files or environment variables.
+import fs from 'fs';
+import path from 'path';
 
-export const redisHost: string = process.env.REDIS_ADDRESS;
-export const redisPort: number = parseInt(process.env.REDIS_PORT, 10) || 6379;
-export const dbIP: string = process.env.DATABASE_ADDRESS; // Allows you to set the IP address of the database.
-export const dbName: string = process.env.DATABASE_NAME || 'kitcoin';
-export const dbUser: string = process.env.DATABASE_USER; // Allows you to set the user this server uses to access the database.
-export const dbPort: number = parseInt(process.env.DATABASE_PORT || '33060', 10); // Allows you to set the database's port.
-export const dbPassword: string = process.env.DATABASE_PASSWORD; // The password for the database user.
-export const waitTime: number = parseFloat(process.env.WAIT_TO_CONNECT || '0'); // Time to wait for MySQL to start in seconds.
-export const oauthCallbackUrl: string = process.env.OAUTH_CALLBACK_URL; // Will have /oauthstage# appended to it. This should be routed to this server, through reverse proxy if necessary.
-export const enableRemote: boolean = process.env.ENABLE_REMOTE === '1';
-export const helpMessage = `
+const CONFIG_PATHS = [
+	path.resolve('.', 'config.json'),
+	path.resolve('/', 'etc', 'kitcoin.json')
+];
+
+function reload(): void {
+	const bkp = JSON.parse(JSON.stringify(module.exports));
+	try {
+		for (const i of CONFIG_PATHS) {
+			if (fs.existsSync(i)) {
+				module.exports = {
+					...module.exports,
+					...JSON.parse(fs.readFileSync(i).toString())
+				};
+			}
+		}
+	} catch (error) {
+		module.exports = bkp;
+		console.error('Config load failed, old config retained.');
+		console.error(error);
+	}
+}
+
+module.exports = {
+	get redisHost(): string {
+		return process.env.REDIS_ADDRESS;
+	},
+	get redisPort(): number {
+		return parseInt(process.env.REDIS_PORT, 10) || 6379;
+	},
+	get dbIP(): string {
+		return process.env.DATABASE_ADDRESS;
+	},
+	get dbName(): string {
+		return process.env.DATABASE_NAME || 'kitcoin';
+	},
+	get dbUser(): string {
+		return process.env.DATABASE_USER;
+	},
+	get dbPort(): number {
+		return parseInt(process.env.DATABASE_PORT || '33060', 10);
+	},
+	get dbPassword(): string {
+		return process.env.DATABASE_PASSWORD;
+	},
+	get waitTime(): number {
+		return parseFloat(process.env.WAIT_TO_CONNECT || '0');
+	},
+	get oauthCallbackUrl(): string {
+		return process.env.OAUTH_CALLBACK_URL;
+	}, // Will have /oauthstage# appended to it. This should be routed to this server, through reverse proxy if necessary.
+	get enableRemote(): boolean {
+		return process.env.ENABLE_REMOTE === '1';
+	},
+	get testing(): boolean {
+		return process.env.INSECURE_TESTING_MODE_IF_YOU_ENABLE_THIS_IN_PRODUCTION_IM_NOT_RESPONSIBLE_FOR_WHAT_HAPPENS_NEXT === 'ENABLE';
+	},
+	helpMessage: `
 ---=== Kitcoin Administrative Interface ===---
 This is a help message for the Kitcoin backend
 server. The following is a list of known
 commands.
 
 - listUsers
-    This command returns all users in a JSON-formatted list. There are no arguments.
+				This command returns all users in a JSON-formatted list. There are no arguments.
 - listTransactions
-    This command returns n most recent transactions, where n is the body parsed as an integer.
+				This command returns n most recent transactions, where n is the body parsed as an integer.
 - grant
-    This command assigns a role to a user, where the body is the user’s email address, a space, and the role to assign.
+				This command assigns a role to a user, where the body is the user’s email address, a space, and the role to assign.
 - degrant
-    This command reverts a user to the "student" role.
+				This command reverts a user to the "student" role.
 - sql
-    This command is not allowed in this version of Kitcoin.
+				This command is not allowed in this version of Kitcoin.
 - probe
-    This command returns a user by email address.
+				This command returns a user by email address.
 - revert
 				This command reverts a transaction by uuid, where the body is the uuid.
 - listSessions
@@ -39,7 +88,8 @@ commands.
 - bogusSession
 				Get a bogus session for a user by id. This can be used to log in as the user.
 - help
-    Returns this help message.`;
+				Returns this help message.`
+};
 
-export const testing = process.env.INSECURE_TESTING_MODE_IF_YOU_ENABLE_THIS_IN_PRODUCTION_IM_NOT_RESPONSIBLE_FOR_WHAT_HAPPENS_NEXT === 'ENABLE';
+reload();
 
