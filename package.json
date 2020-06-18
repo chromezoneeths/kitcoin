@@ -6,6 +6,7 @@
 		"start": "node ./bin/www",
 		"build": "gulp",
 		"ci": "gulp ci",
+		"package": "gulp pkg",
 		"test": "mocha --exit"
 	},
 	"dependencies": {
@@ -36,6 +37,7 @@
 		"chai": "^4.2.0",
 		"del": "^5.1.0",
 		"docker-compose": "^0.23.4",
+		"fs-extra": "^9.0.1",
 		"gulp": "^4.0.0",
 		"gulp-copy": "^4.0.1",
 		"gulp-sourcemaps": "^2.6.5",
@@ -43,6 +45,7 @@
 		"gulp-xo": "^0.24.0",
 		"jest-cli": "^25.3.0",
 		"mocha": "^7.2.0",
+		"pkg": "^4.4.8",
 		"typescript": "^3.8.3",
 		"xo": "^0.28.3"
 	},

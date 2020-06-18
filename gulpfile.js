@@ -6,6 +6,7 @@ const {watch} = require('gulp');
 const xo = require('gulp-xo');
 const {exec} = require('child_process');
 const sourcemaps = require('gulp-sourcemaps');
+const pkg = require('pkg').exec;
 
 gulp.task('ts', () => {
 	return gulp.src('src/**/*.ts', {since: gulp.lastRun('ts')})
@@ -50,6 +51,7 @@ gulp.task('restart', async cb => {
 });
 
 gulp.task('default', gulp.parallel([gulp.series('ts', 'restart'), 'ejs', 'static']));
+
 gulp.task('ci', gulp.parallel(['ts', 'ejs', 'static']));
 
 gulp.task('watch', gulp.series('default', () => {
@@ -58,3 +60,23 @@ gulp.task('watch', gulp.series('default', () => {
 	watch('./static/**', gulp.series('lint', 'static'));
 }));
 
+gulp.task('pkg', gulp.series('default', async () => {
+	const PLATFORMS = [
+		{platform: 'linux', extension: 'linux.elf'},
+		{platform: 'alpine', extension: 'alpine.elf'},
+		{platform: 'macos', extension: 'darwin.out'},
+		{platform: 'win', extension: 'windows.exe'}
+	];
+	for await (const platform of PLATFORMS) {
+		console.log(`Compiling for ${platform.platform}`);
+		await pkg([
+			'.',
+			'--target',
+			`node14-${platform.platform}`,
+			'--output',
+			`packages/kitcoin.${platform.extension}`
+		]).catch(() => {
+			console.error(`Can’t build for ${platform.platform}`);
+		});
+	}
+}));
