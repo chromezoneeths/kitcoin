@@ -5,3 +5,4 @@ dist/*
 /test_data
 /data
 /oauth.env
+/config.json

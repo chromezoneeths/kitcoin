@@ -1,4 +1,29 @@
-// This file loads configuration from environment variables.
+// This file loads configuration from files or environment variables.
+import fs from 'fs';
+import path from 'path';
+
+const CONFIG_PATHS = [
+	path.resolve('.', 'config.json'),
+	path.resolve('/', 'etc', 'kitcoin.json')
+];
+
+function reload(): void {
+	const bkp = JSON.parse(JSON.stringify(module.exports));
+	try {
+		for (const i of CONFIG_PATHS) {
+			if (fs.existsSync(i)) {
+				module.exports = {
+					...module.exports,
+					...JSON.parse(fs.readFileSync(i).toString())
+				};
+			}
+		}
+	} catch (error) {
+		module.exports = bkp;
+		console.error('Config load failed, old config retained.');
+		console.error(error);
+	}
+}
 
 module.exports = {
 	get redisHost(): string {
@@ -41,17 +66,17 @@ server. The following is a list of known
 commands.
 
 - listUsers
-    This command returns all users in a JSON-formatted list. There are no arguments.
+				This command returns all users in a JSON-formatted list. There are no arguments.
 - listTransactions
-    This command returns n most recent transactions, where n is the body parsed as an integer.
+				This command returns n most recent transactions, where n is the body parsed as an integer.
 - grant
-    This command assigns a role to a user, where the body is the user’s email address, a space, and the role to assign.
+				This command assigns a role to a user, where the body is the user’s email address, a space, and the role to assign.
 - degrant
-    This command reverts a user to the "student" role.
+				This command reverts a user to the "student" role.
 - sql
-    This command is not allowed in this version of Kitcoin.
+				This command is not allowed in this version of Kitcoin.
 - probe
-    This command returns a user by email address.
+				This command returns a user by email address.
 - revert
 				This command reverts a transaction by uuid, where the body is the uuid.
 - listSessions
@@ -63,5 +88,8 @@ commands.
 - bogusSession
 				Get a bogus session for a user by id. This can be used to log in as the user.
 - help
-    Returns this help message.`
+				Returns this help message.`
 };
+
+reload();
+
