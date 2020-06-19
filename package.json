@@ -8,7 +8,7 @@
 		"ci": "gulp ci",
 		"package": "gulp pkg",
 		"test:internal": "mocha --exit",
-		"test": "bash tests.sh"
+		"test": "cat /proc/1/cgroup | grep docker > /dev/null && mocha --exit || bash tests.sh"
 	},
 	"dependencies": {
 		"body-parser": "^1.19.0",
