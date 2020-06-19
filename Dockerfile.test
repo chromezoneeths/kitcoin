@@ -8,7 +8,7 @@ RUN npm run-script ci
 FROM node:14
 WORKDIR /app
 EXPOSE 9876
-CMD npm test
+CMD npm run-script test:internal
 COPY --from=0 --chown=0:0 /app/dist ./dist
 COPY --from=0 /app/clientJs ./clientJs
 COPY --from=0 /app/bin ./bin
