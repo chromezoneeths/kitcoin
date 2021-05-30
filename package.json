@@ -23,7 +23,7 @@
 		"morgan": "~1.9.1",
 		"redis": "^3.1.1",
 		"uuid": "^3.3.3",
-		"ws": "^7.2.0"
+		"ws": "^7.4.6"
 	},
 	"devDependencies": {
 		"@types/cookie-parser": "^1.4.2",
